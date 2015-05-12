@@ -16,28 +16,43 @@ var fails = 0;
 
 function lineParser(line) {
     console.log('Line ' + line_index + "/" + fails);
-    var res = accessLogRecord.createObjFromString(line);
 
-    if (res === null){
+    var accessLogRecord_obj = new accessLogRecord();
+    var alr_is_loaded = accessLogRecord_obj.createObjFromString(line);
+
+    if (!alr_is_loaded){
+        console.log('ALR fail');
         fails++;
         return;
     }
 
-    var chaining_res = chainingLogRecord.createObjFromAccessLogRecordObj(res);
+    var chain_obj = new chainingLogRecord();
+    var chain_is_loaded = chain_obj.fillFromAccessLogRecordObj(accessLogRecord_obj);
+    if (!chain_is_loaded){
+        console.log('C fail');
+        fails++;
+        return;
+    }
+
+    chain_obj.chain();
+
+    //
+    // store access log record to elastic
+    //
 
     var body = {};
-    body.ip = res.ip;
-    body.url = res.url;
+    body.ip = accessLogRecord_obj.ip;
+    body.url = accessLogRecord_obj.url;
     //'url_as_term' => self::el_term($this->url),
     //'wait' => intval($this->wait * 1000),
-    body.dt = res.dt;
-    body.ref = res.ref;
+    body.dt = accessLogRecord_obj.dt;
+    body.ref = accessLogRecord_obj.ref;
     //'user_agent' => $this->user_agent,
     //'platform' => $this->platform,
     //'back' => self::el_term($this->back),
     //'back_wait' => intval($this->back_wait * 1000),
     //'back_http_code' => $this->upstream_http_code,
-    body.http_code = res.http_code;
+    body.http_code = accessLogRecord_obj.http_code;
     //'user_agent_as_term' => self::el_term($this->user_agent),
     //'size' => intval($this->size)
 

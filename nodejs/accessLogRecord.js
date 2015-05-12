@@ -5,6 +5,9 @@ function get_type(thing){
 }
 */
 
+/**
+ * модель одной записи аксесс-лога
+ */
 function accessLogRecord(){
     this.ip = '';
     this.domain = '';
@@ -27,43 +30,47 @@ function accessLogRecord(){
     this.user_agent = '';
 }
 
-function createObjFromString(line){
+/**
+ * заполняет модель данными из строки, если удалось - возвращает true
+ * @param line
+ * @returns {boolean}
+ */
+accessLogRecord.prototype.createObjFromString = function (line){
 
     var re = /^([\d\.]+) - ("[^"]+") [a-z-]+ \[([^\]]+)\] "([^"]*)" (\d+) (\d+) ([\d.]+) (\S+) (\S+) "([^"]*)" "([^"]*)" "([^"]*)"/;
     var matches = line.match(re);
 
     if (matches === null){
-        return null;
+        return false;
     }
 
     //console.log(get_type(matches[0]));
 
-    var res = new accessLogRecord;
+    //var res = new accessLogRecord();
 
-    res.ip = matches[1];
-    res.domain = matches[2];
-    res.time = matches[3];
-    res.url = matches[4];
-    res.wait = matches[7];
-    res.upstream_http_code = matches[8];
-    res.http_code = matches[5];
-    res.size = matches[6];
+    this.ip = matches[1];
+    this.domain = matches[2];
+    this.time = matches[3];
+    this.url = matches[4];
+    this.wait = matches[7];
+    this.upstream_http_code = matches[8];
+    this.http_code = matches[5];
+    this.size = matches[6];
 
     //res.ts = strtotime($this->time);
     //res.dt = date('c', $this->ts);
 
-    res.back_wait = matches[9];
-    res.back = matches[10];
+    this.back_wait = matches[9];
+    this.back = matches[10];
 
-    res.ref = matches[11];
+    this.ref = matches[11];
     //res.ref = urldecode($this->ref);
 
-    res.user_agent = matches[12];
+    this.user_agent = matches[12];
 
     //console.log(res);
 
-    return res;
-
+    return true;
 }
 
-exports.createObjFromString = createObjFromString;
+module.exports = accessLogRecord;
