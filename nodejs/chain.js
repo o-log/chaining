@@ -21,6 +21,11 @@ Chain.prototype.getLastItem = function(){
         return this.getItemByIndex(last_item_index);
     };
 
+/**
+ *
+ * @param index
+ * @returns {ChainItem}
+ */
 Chain.prototype.getItemByIndex = function(index){
         if (this.items_arr[index] === undefined) {
             return null;
@@ -44,7 +49,42 @@ var el_client = new elasticsearch.Client({
 Chain.prototype.storeToElastic = function(puuid){
 
     var body = {};
-    body.data = 1;
+    var chain_first_item = this.getItemByIndex(0);
+
+    //body.dt = date('c', $chain_first_item->ts);
+    body.dt = chain_first_item.ts; // TODO
+    body.platform = 'unknown'; // TODO
+    body.ref_as_term = 'none'; // TODO
+
+    for (var i = 0; i < 5; i++) {
+        var url = 'none';
+        var last_action = 'none';
+        var delay = 0;
+
+        var chain_item = this.getItemByIndex(i);
+
+        if (chain_item) {
+            url = chain_item.piwik_url;
+            if (chain_item.piwik_last_action != '') {
+                last_action = chain_item.piwik_last_action;
+            }
+            delay = chain_item.piwik_delay;
+        }
+
+        var param_name = 'url_' + i;
+        body[param_name] = url; // TODO: el_term
+
+        param_name = 'group_' + i;
+        //body[param_name] = \Sportbox\AccessLog\Helper::urlToGroup($url);
+
+        param_name = 'last_action_' + i;
+        body[param_name] = last_action; // TODO: el_term
+
+        param_name = 'delay_' + i;
+        body[param_name] = delay;
+    }
+
+    var chain_id = puuid + '_' + chain_first_item.ts;
 
     /*
      var task = {
@@ -59,7 +99,8 @@ Chain.prototype.storeToElastic = function(puuid){
 
     var task = { index:  {
         _index: 'nodejs_chains',
-        _type: 'nodejs_chains'
+        _type: 'nodejs_chains',
+        _id: chain_id
     }};
 
     bulk.push(task);

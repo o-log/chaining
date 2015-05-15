@@ -31,6 +31,8 @@ chainingLogRecord.prototype.chain = function(){
     new_chain_item_obj.ts = this.ts;
     new_chain_item_obj.piwik_duid = this.piwik_duid;
 
+    console.log(new_chain_item_obj);
+
     // получаем существующую историю этого пользователя если есть
     var puuid = this.piwik_unique_user;
     var chain_obj = context.getChainByKey(puuid);
@@ -128,6 +130,9 @@ chainingLogRecord.prototype.chain = function(){
  * @returns {null}
  */
 chainingLogRecord.prototype.fillFromAccessLogRecordObj = function(accessLogRecord_obj){
+
+    this.ts = accessLogRecord_obj.ts;
+
     var re = /^POST \/sbtracking\/pageview2\?(.+) HTTP\//;
 
     //console.log(accessLogRecord_obj);
