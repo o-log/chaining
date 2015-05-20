@@ -10,6 +10,7 @@ function ChainItem(){
     this.piwik_last_action = 'none'; // действие, которое привело к этому показу страницы
     this.piwik_duid = 'none'; // псевдоуникальный идентификатор этого показа
     this.ts = 0;
+    this.dt = '';
     this.piwik_delay = 0; // сколько секунд прошло между этим показом страницы и предыдущим в цепочке
 }
 
@@ -29,9 +30,10 @@ chainingLogRecord.prototype.chain = function(){
     new_chain_item_obj.piwik_ref = this.piwik_ref;
     new_chain_item_obj.piwik_last_action = this.piwik_last_action;
     new_chain_item_obj.ts = this.ts;
+    new_chain_item_obj.dt = this.dt;
     new_chain_item_obj.piwik_duid = this.piwik_duid;
 
-    console.log(new_chain_item_obj);
+    //console.log(new_chain_item_obj);
 
     // получаем существующую историю этого пользователя если есть
     var puuid = this.piwik_unique_user;
@@ -65,6 +67,8 @@ chainingLogRecord.prototype.chain = function(){
 
         return true;
     }
+
+    //console.log('has chain');
 
     // проверяем, был ли предыдущий показ страницы из истории действительно предыдущим для текущего показа страницы (совпадение duid)
 
@@ -132,6 +136,7 @@ chainingLogRecord.prototype.chain = function(){
 chainingLogRecord.prototype.fillFromAccessLogRecordObj = function(accessLogRecord_obj){
 
     this.ts = accessLogRecord_obj.ts;
+    this.dt = accessLogRecord_obj.dt;
 
     var re = /^POST \/sbtracking\/pageview2\?(.+) HTTP\//;
 

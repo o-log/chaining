@@ -14,7 +14,7 @@ function getChainByKey(key){
  * @param chain_obj
  */
 function setChainByKey(key, chain_obj){
-    _chains['key'] = chain_obj;
+    _chains[key] = chain_obj;
 
     chain_obj.storeToElastic(key);
 }

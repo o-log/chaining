@@ -9,7 +9,9 @@ var line_index = 0;
 var fails = 0;
 
 function lineParser(line) {
-    console.log('Line ' + line_index + "/" + fails);
+    if ((line_index % 10000) == 0) {
+        console.log('Line ' + line_index + "/" + fails);
+    }
 
     var accessLogRecord_obj = new accessLogRecord();
     var alr_is_loaded = accessLogRecord_obj.createObjFromString(line);

@@ -46,13 +46,44 @@ var el_client = new elasticsearch.Client({
     host: 'localhost:9200'
 });
 
+
+//var ie_res = el_client.indices.exists({index: "nodejs_chains"});
+
+//if (!ie_res) {
+
+    console.log('creating index');
+
+    el_client.indices.create({index: "nodejs_chains"}, function(){
+        var body = {
+            nodejs_chains: {
+                properties: {
+                    url_0: {"type": "string", "index": "not_analyzed"},
+                    url_1: {"type": "string", "index": "not_analyzed"},
+                    url_2: {"type": "string", "index": "not_analyzed"},
+                    url_3: {"type": "string", "index": "not_analyzed"},
+                    url_4: {"type": "string", "index": "not_analyzed"}
+                }
+            }
+        };
+
+        el_client.indices.putMapping({index: "nodejs_chains", type: "nodejs_chains", body: body});
+    });
+
+//} else {
+  //  console.log('index exists');
+//}
+
+
+
+
 Chain.prototype.storeToElastic = function(puuid){
 
     var body = {};
     var chain_first_item = this.getItemByIndex(0);
 
-    //body.dt = date('c', $chain_first_item->ts);
-    body.dt = chain_first_item.ts; // TODO
+    //console.log(chain_first_item);
+
+    body.dt = chain_first_item.dt;
     body.platform = 'unknown'; // TODO
     body.ref_as_term = 'none'; // TODO
 
