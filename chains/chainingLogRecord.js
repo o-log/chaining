@@ -1,18 +1,6 @@
 var context = require("./context");
 var Chain = require("./chain");
-
-/**
- * Один показ страницы в цепочке.
- */
-function ChainItem(){
-    this.piwik_url = 'none';
-    this.piwik_ref = 'none';
-    this.piwik_last_action = 'none'; // действие, которое привело к этому показу страницы
-    this.piwik_duid = 'none'; // псевдоуникальный идентификатор этого показа
-    this.ts = 0;
-    this.dt = '';
-    this.piwik_delay = 0; // сколько секунд прошло между этим показом страницы и предыдущим в цепочке
-}
+var ChainItem = require("./chainItem");
 
 function chainingLogRecord(){
     this.piwik_url = '1';
@@ -21,19 +9,18 @@ function chainingLogRecord(){
     this.piwik_last_action = '4';
     this.piwik_duid = '5';
     this.piwik_last_duid = '6';
+    this.page_type = 'none';
+    this.main_rubric = 'none';
 }
 
-chainingLogRecord.prototype.chain = function(){
-    // создаем новый элемент истории пользователя
-    var new_chain_item_obj = new ChainItem();
-    new_chain_item_obj.piwik_url = this.piwik_url;
-    new_chain_item_obj.piwik_ref = this.piwik_ref;
-    new_chain_item_obj.piwik_last_action = this.piwik_last_action;
-    new_chain_item_obj.ts = this.ts;
-    new_chain_item_obj.dt = this.dt;
-    new_chain_item_obj.piwik_duid = this.piwik_duid;
+var yandex_re = /yandex/;
+var google_re = /google/;
+var new_chain_item_obj; // optimization
 
-    //console.log(new_chain_item_obj);
+chainingLogRecord.prototype.chain = function(){
+    // создаем из текущей записи лога новый элемент истории пользователя
+    new_chain_item_obj = new ChainItem();
+    new_chain_item_obj.fillFromChainingLogRecord(this);
 
     // получаем существующую историю этого пользователя если есть
     var puuid = this.piwik_unique_user;
@@ -48,21 +35,38 @@ chainingLogRecord.prototype.chain = function(){
         $google = (preg_match('@google@', $this->piwik_ref));
         */
 
+        //console.log(this.piwik_ref);
+
         var direct = false;
         if (this.piwik_ref == ''){
             direct = true;
+            new_chain_item_obj.origin = 'direct';
         }
 
         var yandex = false;
         var google = false;
 
+        var yandex_matches = this.piwik_ref.match(yandex_re);
+        if (yandex_matches !== null) {
+            new_chain_item_obj.origin = 'yandex';
+            yandex = true;
+        }
+
+        var google_matches = this.piwik_ref.match(google_re);
+        if (google_matches !== null) {
+            new_chain_item_obj.origin = 'google';
+            google = true;
+        }
+
         // создаем цепочки только для первых входов (по рефереру)
         // дополнительно проверять last_duid? это может повтор показа страницы входа из истории
-        if (direct || yandex || google) {
+        if (direct || yandex || google || true) { // пока создаем цепочки без источника - для отладки
             var chain_obj = new Chain();
             chain_obj.user_agent = this.user_agent;
             chain_obj.addItem(new_chain_item_obj);
             context.setChainByKey(puuid, chain_obj);
+        } else {
+            console.log('FAIL 4');
         }
 
         return true;
@@ -74,7 +78,9 @@ chainingLogRecord.prototype.chain = function(){
 
     var last_chain_element = chain_obj.getLastItem();
     //\Sportbox\Helpers::assert($last_chain_element);
-    if (!last_chain_element){throw "";}
+    if (!last_chain_element){
+        throw "";
+    }
 
     if (this.piwik_last_duid != last_chain_element.piwik_duid) {
 
@@ -94,7 +100,7 @@ chainingLogRecord.prototype.chain = function(){
             this.piwik_last_action = 'history_navigation';
             new_chain_item_obj.piwik_last_action = this.piwik_last_action;
         } else {
-            console.log("FAIL3"); // пока просто логируем, потом разобраться
+            //console.log("FAIL 3"); // пока просто логируем, потом разобраться
         }
     }
 
@@ -126,12 +132,12 @@ chainingLogRecord.prototype.chain = function(){
 
     return true;
 
-}
+};
 
 /**
  * заполняет объект данными из объекта записи аксесс лога, возвращает true если успешно
  * @param {accessLogRecord} accessLogRecord_obj
- * @returns {null}
+ * @returns {boolean}
  */
 chainingLogRecord.prototype.fillFromAccessLogRecordObj = function(accessLogRecord_obj){
 
@@ -140,34 +146,21 @@ chainingLogRecord.prototype.fillFromAccessLogRecordObj = function(accessLogRecor
 
     var re = /^POST \/sbtracking\/pageview2\?(.+) HTTP\//;
 
-    //console.log(accessLogRecord_obj);
-
     var matches = accessLogRecord_obj.url.match(re);
 
     if (matches === null){
-        console.log('not pageview2');
         return false;
     }
 
     var query = matches[1];
-
-    //var res = {};
-
     var url_parts_arr = query.split('&');
-    //console.log(url_parts_arr );
 
-    //url_parts_arr.forEach(function(item, i, arr){
     for (var i = 0; i < url_parts_arr.length; i++){
         var item = url_parts_arr[i];
-        //console.log(item);
         if (item.indexOf('=') != -1){
-            //console.log(item);
             var item_parts_arr = item.split('=');
             var key = item_parts_arr[0];
             var value = item_parts_arr[1];
-
-            //console.log(key);
-            //console.log(value);
 
             switch (key) {
                 case 'url':
@@ -193,13 +186,19 @@ chainingLogRecord.prototype.fillFromAccessLogRecordObj = function(accessLogRecor
                 case'last_duid':
                     this.piwik_last_duid = value; // TODO: decode not needed?
                     break;
+
+                case'main_rubric':
+                    this.main_rubric = value; // TODO: decode not needed?
+                    break;
+
+                case'page_type':
+                    this.page_type = value; // TODO: decode not needed?
+                    break;
             }
         }
-    };
-
-    //console.log(this);
+    }
 
     return true;
-}
+};
 
 module.exports = chainingLogRecord;

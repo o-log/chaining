@@ -6,13 +6,6 @@ var el_client = new elasticsearch.Client({
 
 var bulk = [];
 
-/*
-function get_type(thing){
-    if(thing===null)return "[object Null]"; // special case
-    return Object.prototype.toString.call(thing);
-}
-*/
-
 /**
  * модель одной записи аксесс-лога
  */
@@ -26,8 +19,6 @@ function accessLogRecord(){
     this.http_code = '';
     this.size = '';
 
-    //this.ts = strtotime($this->time);
-    //res.dt = date('c', $this->ts);
     this.ts = 0;
     this.dt = 0; // TODO: use valid default date?
 
@@ -35,7 +26,6 @@ function accessLogRecord(){
     this.back = '';
 
     this.ref = '';
-    //res.ref = urldecode($this->ref);
 
     this.user_agent = '';
 }
@@ -54,10 +44,6 @@ accessLogRecord.prototype.createObjFromString = function (line){
         return false;
     }
 
-    //console.log(get_type(matches[0]));
-
-    //var res = new accessLogRecord();
-
     this.ip = matches[1];
     this.domain = matches[2];
     this.time = matches[3];
@@ -67,41 +53,25 @@ accessLogRecord.prototype.createObjFromString = function (line){
     this.http_code = matches[5];
     this.size = matches[6];
 
-    //console.log(this.time);
-
     var clf_date_re = /^(.+?)\/(.+?)\/(.+?):(.+)$/;
     var clf_date_matches = this.time.match(clf_date_re);
 
     var rfc822_date = clf_date_matches[1] + ' ' + clf_date_matches[2] + ' ' + clf_date_matches[3] + ' ' + clf_date_matches[4];
 
-    //console.log(clf_date_matches);
-
-
-    //var pd = Date.parse(rfc822_date);
-
-    //console.log(pd);
-
     var d = new Date(rfc822_date);
-
-    //console.log(d);
 
     this.ts = d.getTime();
     this.dt = d.toISOString();
-
-    //console.log(this.dt);
 
     this.back_wait = matches[9];
     this.back = matches[10];
 
     this.ref = matches[11];
-    //res.ref = urldecode($this->ref);
 
     this.user_agent = matches[12];
 
-    //console.log(res);
-
     return true;
-}
+};
 
 accessLogRecord.prototype.storeToElastic = function(){
     //
@@ -151,6 +121,6 @@ accessLogRecord.prototype.storeToElastic = function(){
         bulk = [];
     }
 
-}
+};
 
 module.exports = accessLogRecord;

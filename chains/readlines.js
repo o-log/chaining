@@ -19,6 +19,9 @@ function readLines(input, func) {
         if (remaining.length > 0) {
             func(remaining);
         }
+
+        console.log('check for probable not stored chains!');
+        process.exit(0);
     });
 }
 

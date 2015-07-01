@@ -19,5 +19,11 @@ function setChainByKey(key, chain_obj){
     chain_obj.storeToElastic(key);
 }
 
+function getChainsCount(){
+    //return _chains.length();
+    return 0;
+}
+
 exports.getChainByKey = getChainByKey;
 exports.setChainByKey = setChainByKey;
+exports.getChainsCount = getChainsCount;

@@ -1,3 +1,4 @@
+var elasticsearch = require('elasticsearch');
 
 function Chain() {
     //static $_buffer = array();
@@ -38,42 +39,12 @@ Chain.prototype.addItem = function(item_obj){
         this.items_arr.push(item_obj);
 };
 
-var bulk = [];
-
-var elasticsearch = require('elasticsearch');
 
 var el_client = new elasticsearch.Client({
     host: 'localhost:9200'
 });
 
-
-//var ie_res = el_client.indices.exists({index: "nodejs_chains"});
-
-//if (!ie_res) {
-
-    console.log('creating index');
-
-    el_client.indices.create({index: "nodejs_chains"}, function(){
-        var body = {
-            nodejs_chains: {
-                properties: {
-                    url_0: {"type": "string", "index": "not_analyzed"},
-                    url_1: {"type": "string", "index": "not_analyzed"},
-                    url_2: {"type": "string", "index": "not_analyzed"},
-                    url_3: {"type": "string", "index": "not_analyzed"},
-                    url_4: {"type": "string", "index": "not_analyzed"}
-                }
-            }
-        };
-
-        el_client.indices.putMapping({index: "nodejs_chains", type: "nodejs_chains", body: body});
-    });
-
-//} else {
-  //  console.log('index exists');
-//}
-
-
+var bulk = [];
 
 
 Chain.prototype.storeToElastic = function(puuid){
@@ -81,16 +52,16 @@ Chain.prototype.storeToElastic = function(puuid){
     var body = {};
     var chain_first_item = this.getItemByIndex(0);
 
-    //console.log(chain_first_item);
-
     body.dt = chain_first_item.dt;
     body.platform = 'unknown'; // TODO
-    body.ref_as_term = 'none'; // TODO
+    body.ref = chain_first_item.piwik_ref;
+    body.origin = chain_first_item.origin;
 
     for (var i = 0; i < 5; i++) {
         var url = 'none';
         var last_action = 'none';
         var delay = 0;
+        var group = '';
 
         var chain_item = this.getItemByIndex(i);
 
@@ -100,13 +71,14 @@ Chain.prototype.storeToElastic = function(puuid){
                 last_action = chain_item.piwik_last_action;
             }
             delay = chain_item.piwik_delay;
+            group = chain_item.group;
         }
 
         var param_name = 'url_' + i;
         body[param_name] = url; // TODO: el_term
 
         param_name = 'group_' + i;
-        //body[param_name] = \Sportbox\AccessLog\Helper::urlToGroup($url);
+        body[param_name] = group;
 
         param_name = 'last_action_' + i;
         body[param_name] = last_action; // TODO: el_term
