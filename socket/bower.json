@@ -1,0 +1,20 @@
+{
+  "name": "socket",
+  "main": "index.js",
+  "version": "0.0.0",
+  "homepage": "https://github.com/o-log/chaining",
+  "authors": [
+    "Oleg Loginov <olognv@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0"
+  }
+}
