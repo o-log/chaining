@@ -14,9 +14,13 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 app.use('/static', express.static('public'));
+app.use('/bower_components', express.static('bower_components'));
 
 app.get('/', function(req, res){
     res.sendFile(__dirname + '/index.html');
+});
+app.get('/favicon.ico', function(req, res){
+    res.sendFile(__dirname + '/favicon.ico');
 });
 
 var socket_obj = null;

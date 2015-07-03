@@ -1,0 +1,54 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<dom-module id="crud-table-row">
+
+    <!-- scoped CSS for this element -->
+    <style>
+        div {
+            padding: 4px;
+        }
+
+    </style>
+
+    <template>
+        <div id="row">
+            <a id="edit_link" href="#">edit</a>
+        </div>
+    </template>
+
+    <script>
+        CrudTableRow = Polymer({
+            is: "crud-table-row",
+
+            factoryImpl: function(full_obj_id) {
+                var obj = storage.getObject(full_obj_id);
+                var obj_class_name = obj._class_name;
+
+                var class_config = crud.crud_config[obj_class_name];
+                var list_config = class_config.objects_list;
+
+                //if (list_config){
+                    for (var i in list_config.columns){
+                        var field_config = list_config.columns[i];
+                        var field_name = field_config.field_name;
+                        var field_value = obj[field_name];
+
+                        var span = document.createElement('span');
+                        span.textContent = field_value;
+                        this.$.row.appendChild(span);
+                    }
+                //}
+
+                //console.log('factoryImpl');
+                //this.$.edit_link.textContent = obj.title;
+                this.$.edit_link.dataset.crud_obj_full_id = full_obj_id;
+                this.$.edit_link.onclick = crud.crudObjectInListOnClick;
+            },
+
+            ready: function(){
+                //console.log('ready');
+            }
+        });
+    </script>
+
+</dom-module>

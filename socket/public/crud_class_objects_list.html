@@ -1,0 +1,38 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<dom-module id="crud-class-objects-list">
+
+    <!-- scoped CSS for this element -->
+    <style>
+    </style>
+
+    <template>
+        <div>
+            <h1><a href="#" onclick="return crud.showClassesList();">классы</a> / <span id="title"></span></h1>
+            <div id="list_container"></div>
+        </div>
+    </template>
+
+    <script>
+        CrudClassObjectsList = Polymer({
+            is: "crud-class-objects-list",
+
+            factoryImpl: function(class_name) {
+                this.$.title.textContent = class_name;
+
+                socket.emit('objects_list', class_name);
+            },
+
+            addObject: function(obj){
+                var obj_full_id = model.getFullIdForObj(obj);
+                storage._obj_arr[obj_full_id] = obj; // TODO: replace with storage.setObject
+
+                var new_block_element = new CrudTableRow(obj_full_id);
+
+                this.$.list_container.appendChild(new_block_element);
+
+            }
+        });
+    </script>
+
+</dom-module>

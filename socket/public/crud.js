@@ -1,6 +1,12 @@
 var crud = {
     crud_config: {
         'blocks': {
+            'objects_list': {
+                'columns': [
+                    {'field_name': 'id'},
+                    {'field_name': 'title'}
+                ]
+            },
             'object_editor': [
                 {'field_name': 'title'},
                 {'field_name': 'body'},
@@ -8,10 +14,51 @@ var crud = {
             ]
         },
         'operator': {
+            'objects_list': {
+                'columns': [
+                    {'field_name': 'id'},
+                    {'field_name': 'title'}
+                ]
+            },
             'object_editor': [
                 {'field_name': 'title'}
             ]
+        },
+        'tv_city': {
+            'object_editor': [
+                {'field_name': 'name'}
+            ]
+        },
+        'tv_channel': {
+            'object_editor': [
+                {'field_name': 'name'}
+            ]
         }
+    },
+
+    showClassesList: function () {
+        var classes_list_component = new CrudClassesList();
+        document.querySelector('#page-content').innerHTML = '';
+        document.querySelector('#page-content').appendChild(classes_list_component);
+
+        return false;
+    },
+
+    crudClassOnClick: function () {
+        var class_name = $(this).data('crud_class_name');
+
+        crud.showClassObjectsList(class_name);
+
+        return false;
+    },
+
+    showClassObjectsList: function (class_name) {
+        var list = new CrudClassObjectsList(class_name);
+        crud_lists[class_name] = list;
+
+//$('body').append(list);
+        document.querySelector('#page-content').innerHTML = '';
+        document.querySelector('#page-content').appendChild(list);
     },
 
     crudObjectInListOnClick: function () {
@@ -21,7 +68,12 @@ var crud = {
 
         var editor_html = crud.renderEditorForObjFullId(obj_full_id);
         //$('body').prepend(editor_html);
-        $(editor_html).insertAfter(this);
+        //$(editor_html).insertAfter(this);
+
+        document.querySelector('#page-content').innerHTML = '';
+        document.querySelector('#page-content').innerHTML = editor_html;
+
+        return false;
     },
 
 
@@ -30,7 +82,7 @@ var crud = {
 
         var html = '';
         html += '<div id="crud_obj_editor">';
-        html += '<h1><a href="#" onclick="crudCloseEditor();">list</a> / EDITOR</h1>';
+        html += '<h1><a href="#" onclick="return crud.showClassesList();">классы</a> / <a href="#" onclick="return crud.showClassObjectsList(\'' + obj._class_name + '\');">' + obj._class_name + '</a> / EDITOR</h1>';
 
         var crud_config_for_class = crud.crud_config[obj._class_name];
         for (var i = 0; i < crud_config_for_class.object_editor.length; i++) {

@@ -1,0 +1,31 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<dom-module id="crud-classes-list">
+
+    <!-- scoped CSS for this element -->
+    <style>
+    </style>
+
+    <template>
+        <div>
+            <h1 id="title">классы</h1>
+            <div id="list_container"></div>
+        </div>
+    </template>
+
+    <script>
+        CrudClassesList = Polymer({
+            is: "crud-classes-list",
+
+            ready: function(){
+                for (var class_name in crud.crud_config){
+                    var row_component = new CrudClassesListRow(class_name);
+
+                    this.$.list_container.appendChild(row_component);
+                }
+
+            }
+        });
+    </script>
+
+</dom-module>

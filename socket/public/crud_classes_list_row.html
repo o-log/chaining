@@ -1,0 +1,35 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<dom-module id="crud-classes-list-row">
+
+    <!-- scoped CSS for this element -->
+    <style>
+        div {
+            padding: 4px;
+        }
+
+    </style>
+
+    <template>
+        <div>
+            <a id="edit_link" href="#"></a>
+        </div>
+    </template>
+
+    <script>
+        CrudClassesListRow = Polymer({
+            is: "crud-classes-list-row",
+
+            factoryImpl: function(class_name) {
+                this.$.edit_link.textContent = class_name;
+                this.$.edit_link.dataset.crud_class_name = class_name;
+                this.$.edit_link.onclick = crud.crudClassOnClick;
+            },
+
+            ready: function(){
+                console.log('ready');
+            }
+        });
+    </script>
+
+</dom-module>
