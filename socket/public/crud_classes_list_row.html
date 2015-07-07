@@ -21,7 +21,9 @@
             is: "crud-classes-list-row",
 
             factoryImpl: function(class_name) {
-                this.$.edit_link.textContent = class_name;
+                var class_title = crud.getClassTitleByName(class_name);
+
+                this.$.edit_link.textContent = class_title;
                 this.$.edit_link.dataset.crud_class_name = class_name;
                 this.$.edit_link.onclick = crud.crudClassOnClick;
             },

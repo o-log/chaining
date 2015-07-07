@@ -18,7 +18,7 @@
             is: "crud-class-objects-list",
 
             factoryImpl: function(class_name) {
-                this.$.title.textContent = class_name;
+                this.$.title.textContent = crud.getClassTitleByName(class_name);
 
                 socket.emit('objects_list', class_name);
             },

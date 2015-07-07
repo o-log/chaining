@@ -6,10 +6,13 @@
             font-family: "RobotoDraft",Helvetica,Arial,sans-serif;
             padding: 50px;
         }
-
         #page-content{
             background-color: #eeeeee;
             padding: 20px;
+        }
+        a {
+            color: #666666;
+            text-decoration: none;
         }
     </style>
 </head>
@@ -24,12 +27,18 @@
 <script src="/static/storage.js"></script>
 <script src="/static/model.js"></script>
 
+<!-- TODO: auto-include components? -->
 <link rel="import" href="static/crud_table_row.html">
 <link rel="import" href="static/crud_class_objects_list.html">
 <link rel="import" href="static/crud_classes_list.html">
 <link rel="import" href="static/crud_classes_list_row.html">
+<link rel="import" href="static/crud_editor.html">
+<link rel="import" href="bower_components/paper-button/paper-button.html">
+<link rel="import" href="bower_components/paper-input/paper-input.html">
+<link rel="import" href="static/crud_table_cell_text.html">
+<link rel="import" href="static/crud_editor_field_input.html">
 
-<div id="page-content"></div>
+<paper-material id="page-content"></paper-material>
 
 <script>
 

@@ -73,7 +73,7 @@ function onObjectsList(msg){
 }
 
 function dumpObjects(socket_obj, class_name){
-    news_db_connection.query('select * from ??', [class_name], function(err, rows, fields) {
+    news_db_connection.query('select * from ?? limit 10000', [class_name], function(err, rows, fields) {
         if (err) {
             throw err;
         }

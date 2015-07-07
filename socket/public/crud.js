@@ -1,39 +1,174 @@
 var crud = {
     crud_config: {
-        'blocks': {
-            'objects_list': {
-                'columns': [
-                    {'field_name': 'id'},
-                    {'field_name': 'title'}
+        blocks: {
+            objects_list: {
+                columns: [
+                    {
+                        field_name: 'id',
+                        widget: {
+                            name: 'text',
+                            params: {edit_link: true}
+                        }
+                    },
+                    {
+                        field_name: 'title',
+                        widget: {
+                            name: 'text',
+                            params: {}
+                        }
+                    }
+                ]
+            },
+            object_editor: [
+                {field_name: 'title'},
+                {field_name: 'body'},
+                {field_name: 'pages'}
+            ]
+        },
+        operator: {
+            title: 'операторы',
+            objects_list: {
+                columns: [
+                    {'field_name': 'id',
+                        widget: {
+                            name: 'text',
+                            params: {edit_link: false}
+                        }
+                    },
+                    {'field_name': 'title',
+                        widget: {
+                            name: 'text',
+                            params: {edit_link: true}
+                        }
+                    }
+                ]
+            },
+            object_editor: [
+                {field_name: 'title', widget: {name: 'input'}},
+                {field_name: 'authapi_user_id', widget: {name: 'input'}}
+            ]
+        },
+        tv_city: {
+            objects_list: {
+                columns: [
+                    {
+                        'field_name': 'id',
+                        widget: {
+                            name: 'text',
+                            params: {edit_link: false}
+                        }
+                    },
+                    {
+                        'field_name': 'name',
+                        widget: {
+                            name: 'text',
+                            params: {edit_link: true}
+                        }
+                    }
                 ]
             },
             'object_editor': [
-                {'field_name': 'title'},
-                {'field_name': 'body'},
-                {'field_name': 'pages'}
+                {
+                    field_name: 'name',
+                    widget: {name: 'input'}
+                },
+                {
+                    field_name: 'time_zone_relative_moscow',
+                    widget: {name: 'input'}
+                },
+                {
+                    field_name: 'servicetv_id',
+                    widget: {name: 'input'}
+                },
+                {
+                    field_name: 'servicetv_country_id',
+                    widget: {name: 'input'}
+                }
+
+
+
             ]
         },
-        'operator': {
-            'objects_list': {
-                'columns': [
-                    {'field_name': 'id'},
-                    {'field_name': 'title'}
+        tv_channel: {
+            title: 'каналы телепрограммы',
+            objects_list: {
+                columns: [
+                    {
+                        'field_name': 'name',
+                        widget: {
+                            name: 'text',
+                            params: {edit_link: true}
+                        }
+                    }
                 ]
             },
             'object_editor': [
-                {'field_name': 'title'}
+                {
+                    field_name: 'name',
+                    widget: {name: 'input'}
+                },
+                {
+                    field_name: 'servicetv_id',
+                    widget: {name: 'input'}
+                },
+                {
+                    field_name: 'block_id',
+                    widget: {name: 'input'}
+                },
+                {
+                    field_name: 'logo',
+                    widget: {name: 'input'}
+                }
             ]
         },
-        'tv_city': {
+        tv_transmission: {
+            objects_list: {
+                columns: [
+                    {
+                        'field_name': 'id',
+                        widget: {
+                            name: 'text',
+                            params: {edit_link: false}
+                        }
+                    },
+                    {
+                        'field_name': 'title',
+                        widget: {
+                            name: 'text',
+                            params: {edit_link: true}
+                        }
+                    }
+                ]
+            },
             'object_editor': [
-                {'field_name': 'name'}
-            ]
-        },
-        'tv_channel': {
-            'object_editor': [
-                {'field_name': 'name'}
+                {
+                    field_name: 'title',
+                    widget: {name: 'input'}
+                },
+                {
+                    field_name: 'start_timestamp_moscow',
+                    widget: {name: 'input'}
+                },
+                {
+                    field_name: 'finish_timestamp_moscow',
+                    widget: {name: 'input'}
+                },
+                {
+                    field_name: 'description',
+                    widget: {name: 'input'}
+                }
             ]
         }
+    },
+
+    getClassTitleByName: function(class_name) {
+        var crud_class_config = crud.crud_config[class_name];
+        var class_title = crud_class_config.title;
+        if (!class_title) {
+            class_title = class_name;
+        }
+
+        return class_title;
     },
 
     showClassesList: function () {
@@ -56,7 +191,6 @@ var crud = {
         var list = new CrudClassObjectsList(class_name);
         crud_lists[class_name] = list;
 
-//$('body').append(list);
         document.querySelector('#page-content').innerHTML = '';
         document.querySelector('#page-content').appendChild(list);
     },
@@ -64,19 +198,17 @@ var crud = {
     crudObjectInListOnClick: function () {
         var obj_full_id = $(this).data('crud_obj_full_id');
 
-        //$('#obj_list_container').remove(); // remove list only after reading obj attrs from one
-
-        var editor_html = crud.renderEditorForObjFullId(obj_full_id);
-        //$('body').prepend(editor_html);
-        //$(editor_html).insertAfter(this);
+        //var editor_html = crud.renderEditorForObjFullId(obj_full_id);
+        var editor_component = new CrudEditor(obj_full_id);
 
         document.querySelector('#page-content').innerHTML = '';
-        document.querySelector('#page-content').innerHTML = editor_html;
+        document.querySelector('#page-content').appendChild(editor_component);
 
         return false;
     },
 
 
+    /*
     renderEditorForObjFullId: function (obj_full_id) {
         var obj = storage._obj_arr[obj_full_id];
 
@@ -96,30 +228,9 @@ var crud = {
 
         return html;
     },
+    */
 
-    saveEditor: function (obj_full_id) {
-        var obj = storage._obj_arr[obj_full_id];
-
-        var crud_config_for_class = crud.crud_config[obj._class_name];
-        for (var i = 0; i < crud_config_for_class.object_editor.length; i++) {
-            var field_config = crud_config_for_class.object_editor[i];
-            var property_name = field_config.field_name;
-
-            var field_editor_element = $('#editor_field__' + property_name);
-            var field_value = field_editor_element.val();
-            console.log(field_value);
-
-            var data = {};
-            data.object_class_name = obj._class_name;
-            data.object_id = obj.id;
-            data.field_name = property_name;
-            data.field_value = field_value;
-
-            socket.emit('update_object_field', data);
-
-        }
-    },
-
+    /*
     renderEditorField: function (obj_full_id, property_name) {
         var html = '';
         var obj = storage._obj_arr[obj_full_id];
@@ -132,4 +243,5 @@ var crud = {
 
         return html;
     }
+    */
 };
