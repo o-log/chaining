@@ -1,28 +1,46 @@
+
 var crud = {
-    crud_config: {
+    lists: {},
+
+    config: {
         blocks: {
-            objects_list: {
+            table: {
+                search_fields: [
+                    {
+                        field_name: 'id'
+                    },
+                    {
+                        field_name: 'info'
+                    }
+                ],
+                //group_by: 'region',
+                page_size: 100,
                 columns: [
                     {
                         field_name: 'id',
-                        widget: {
-                            name: 'text',
-                            params: {edit_link: true}
-                        }
+                        widget: {name: 'text', params: {edit_link: false}}
                     },
                     {
-                        field_name: 'title',
-                        widget: {
-                            name: 'text',
-                            params: {}
-                        }
+                        field_name: 'info',
+                        widget: {name: 'text', params: {edit_link: true}}
+                    },
+                    {
+                        field_name: 'region',
+                        widget: {name: 'text', params: {}}
                     }
                 ]
             },
-            object_editor: [
-                {field_name: 'title'},
-                {field_name: 'body'},
-                {field_name: 'pages'}
+            editor: [
+                {field_name: 'region', widget: {name: 'input'}},
+                {field_name: 'weight', widget: {name: 'input'}},
+                {field_name: 'title', widget: {name: 'input'}},
+                {field_name: 'info', widget: {name: 'input'}},
+                {field_name: 'body', widget: {name: 'textarea'}},
+                {field_name: 'pages', widget: {name: 'textarea'}},
+                {field_name: 'format', widget: {name: 'textarea'}},
+                {field_name: 'php_is_safe', widget: {name: 'textarea'}},
+                {field_name: 'cache', widget: {name: 'textarea'}},
+                {field_name: 'visible_only_for_administrators', widget: {name: 'textarea'}}
             ]
         },
         operator: {
@@ -162,21 +180,13 @@ var crud = {
     },
 
     getClassTitleByName: function(class_name) {
-        var crud_class_config = crud.crud_config[class_name];
+        var crud_class_config = crud.config[class_name];
         var class_title = crud_class_config.title;
         if (!class_title) {
             class_title = class_name;
         }
 
         return class_title;
-    },
-
-    showClassesList: function () {
-        var classes_list_component = new CrudClassesList();
-        document.querySelector('#page-content').innerHTML = '';
-        document.querySelector('#page-content').appendChild(classes_list_component);
-
-        return false;
     },
 
     crudClassOnClick: function () {
@@ -188,8 +198,8 @@ var crud = {
     },
 
     showClassObjectsList: function (class_name) {
-        var list = new CrudClassObjectsList(class_name);
-        crud_lists[class_name] = list;
+        var list = new CrudTable(class_name);
+        crud.lists[class_name] = list;
 
         document.querySelector('#page-content').innerHTML = '';
         document.querySelector('#page-content').appendChild(list);
@@ -199,49 +209,11 @@ var crud = {
         var obj_full_id = $(this).data('crud_obj_full_id');
 
         //var editor_html = crud.renderEditorForObjFullId(obj_full_id);
-        var editor_component = new CrudEditor(obj_full_id);
+        var editor_component = new crudEditor.component(obj_full_id);
 
         document.querySelector('#page-content').innerHTML = '';
         document.querySelector('#page-content').appendChild(editor_component);
 
         return false;
-    },
-
-
-    /*
-    renderEditorForObjFullId: function (obj_full_id) {
-        var obj = storage._obj_arr[obj_full_id];
-
-        var html = '';
-        html += '<div id="crud_obj_editor">';
-        html += '<h1><a href="#" onclick="return crud.showClassesList();">классы</a> / <a href="#" onclick="return crud.showClassObjectsList(\'' + obj._class_name + '\');">' + obj._class_name + '</a> / EDITOR</h1>';
-
-        var crud_config_for_class = crud.crud_config[obj._class_name];
-        for (var i = 0; i < crud_config_for_class.object_editor.length; i++) {
-            var field_config = crud_config_for_class.object_editor[i];
-            var property_name = field_config.field_name;
-            html += crud.renderEditorField(obj_full_id, property_name);
-        }
-
-        html += '<div><input type="button" value="Save" onclick="crud.saveEditor(\'' + obj_full_id + '\');"></div>';
-        html += '</div>';
-
-        return html;
-    },
-    */
-
-    /*
-    renderEditorField: function (obj_full_id, property_name) {
-        var html = '';
-        var obj = storage._obj_arr[obj_full_id];
-
-        var property_value = obj[property_name];
-
-        html += '<div><div>' + property_name + '</div>';
-        html += '<textarea id="editor_field__' + property_name + '">' + property_value + '</textarea>';
-        html += '</div>';
-
-        return html;
     }
-    */
 };

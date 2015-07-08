@@ -13,7 +13,7 @@ news_db_connection.connect();
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-app.use('/static', express.static('public'));
+app.use('/public', express.static('public'));
 app.use('/bower_components', express.static('bower_components'));
 
 app.get('/', function(req, res){
@@ -54,26 +54,50 @@ function onUpdateObjectField(data){
             }
         }
     );
-
-
 }
 
 function onObjectsList(msg){
-    var class_name = msg;
-    console.log('message: ' + msg);
-    //socket_obj.emit('chat message', 'hi! ' + msg);
-
-    /*
-    if (msg == 'blocks'){
-        dumpBlocks(socket_obj, msg);
-    }
-    */
-
-    dumpObjects(socket_obj, class_name);
+    dumpObjects(socket_obj, msg);
 }
 
-function dumpObjects(socket_obj, class_name){
-    news_db_connection.query('select * from ?? limit 10000', [class_name], function(err, rows, fields) {
+function dumpObjects(socket_obj, command){
+    var class_name = command.class_name;
+    var order_by = command.order_by;
+    var limit = command.limit;
+
+    if (!limit){
+        limit = 100; // safety limit
+    }
+
+    if (!order_by){
+        order_by = 'id';
+    }
+
+    var sql = 'select * from ?? where 1=1 ';
+    var params = [class_name];
+
+    //var where = [];
+    //var where_params = [];
+
+    if (command.filters){
+        for (var i in command.filters){
+            var filter = command.filters[i];
+
+            sql += ' and ?? like ? ';
+            params.push(filter.field_name);
+            params.push(filter.value + '%');
+        }
+    }
+
+    sql += ' order by ??';
+    params.push(order_by);
+
+    sql += ' limit ?';
+    params.push(limit);
+
+    console.log(sql, params);
+
+    news_db_connection.query(sql, params, function(err, rows, fields) {
         if (err) {
             throw err;
         }

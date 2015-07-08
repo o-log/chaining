@@ -9,23 +9,34 @@
     <template>
         <div>
             <h1 id="title">классы</h1>
-            <div id="list_container"></div>
+            <div>
+                <content></content>
+            </div>
         </div>
     </template>
 
     <script>
-        CrudClassesList = Polymer({
-            is: "crud-classes-list",
+        var crudClassesList = {
+            show: function () {
+                var classes_list_component = new crudClassesList.component();
+                document.querySelector('#page-content').innerHTML = '';
+                document.querySelector('#page-content').appendChild(classes_list_component);
 
-            ready: function(){
-                for (var class_name in crud.crud_config){
-                    var row_component = new CrudClassesListRow(class_name);
+                return false;
+            },
 
-                    this.$.list_container.appendChild(row_component);
+            component: Polymer({
+                is: "crud-classes-list",
+
+                ready: function () {
+                    for (var class_name in crud.config) {
+                        var row_component = new CrudClassesListRow(class_name);
+
+                        Polymer.dom(this).appendChild(row_component);
+                    }
                 }
-
-            }
-        });
+            })
+        };
     </script>
 
 </dom-module>

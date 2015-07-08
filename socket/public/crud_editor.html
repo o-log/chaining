@@ -8,77 +8,83 @@
     <template>
         <div id="crud_obj_editor">
             <h1>
-                <a href="#" onclick="return crud.showClassesList();">классы</a> / <a href="#" id="back_to_table_link" onclick="return crudEditor_backToTable();"></a> / EDITOR
+                <a href="#" onclick="return crudClassesList.show();">классы</a> / <a href="#" id="back_to_table_link"
+                                                                                     onclick="return crudEditor.backToTable();"></a>
+                / EDITOR
             </h1>
-            <div id="fields_container"></div>
-            <div><paper-button raised onclick="crudEditor_saveEditor();">Сохранить</paper-button></div>
+
+            <div><content></content></div>
+            <div style="text-align: right;">
+                <paper-button raised onclick="crudEditor.saveEditor();">Сохранить</paper-button>
             </div>
+        </div>
         </div>
     </template>
 
     <script>
-        function crudEditor_backToTable(){
-            var editor_element = document.querySelector('#crud_obj_editor');
-            var obj_full_id = editor_element.dataset.obj_full_id;
-            var obj = storage._obj_arr[obj_full_id];
-            var class_name = obj._class_name;
-            crud.showClassObjectsList(class_name);
-        }
+        var crudEditor = {
+            obj_full_id: '', // TODO: avoid global variable, store obj id to editor component
 
-        function crudEditor_saveEditor() {
-            var editor_element = document.querySelector('#crud_obj_editor');
-            var obj_full_id = editor_element.dataset.obj_full_id;
+            component: Polymer({
+                is: "crud-editor",
 
-            var obj = storage._obj_arr[obj_full_id];
+                factoryImpl: function (obj_full_id) {
+                    crudEditor.obj_full_id = obj_full_id;
 
-            var crud_config_for_class = crud.crud_config[obj._class_name];
-            for (var i = 0; i < crud_config_for_class.object_editor.length; i++) {
-                var field_config = crud_config_for_class.object_editor[i];
-                var property_name = field_config.field_name;
+                    var obj = storage.getObject(obj_full_id);
 
-                var field_editor_element = document.querySelector('.editor_field__' + property_name);
-                var field_value = field_editor_element.value;
-                console.log(field_value);
+                    var class_name = obj._class_name;
+                    this.$.back_to_table_link.textContent = class_name;
 
-                var data = {};
-                data.object_class_name = obj._class_name;
-                data.object_id = obj.id;
-                data.field_name = property_name;
-                data.field_value = field_value;
+                    var crud_config_for_class = crud.config[obj._class_name];
+                    for (var i = 0; i < crud_config_for_class.editor.length; i++) {
+                        var field_config = crud_config_for_class.editor[i];
 
-                socket.emit('update_object_field', data);
+                        var field_component = null;
+                        switch(field_config.widget.name){
+                            case 'input':
+                                field_component = new CrudEditorFieldInput(obj_full_id, field_config.field_name, field_config.widget.params);
+                                break;
+                            case 'textarea':
+                                field_component = new CrudEditorFieldTextarea(obj_full_id, field_config.field_name, field_config.widget.params);
+                                break;
+                        }
 
-            }
-        }
-
-        CrudEditor = Polymer({
-            is: "crud-editor",
-
-            factoryImpl: function(obj_full_id) {
-                this.$.crud_obj_editor.dataset.obj_full_id = obj_full_id;
-
-                var obj = storage._obj_arr[obj_full_id];
-                var html = '';
-
-                var class_name = obj._class_name;
-                this.$.back_to_table_link.textContent = class_name;
-
-                var crud_config_for_class = crud.crud_config[obj._class_name];
-                for (var i = 0; i < crud_config_for_class.object_editor.length; i++) {
-                    var field_config = crud_config_for_class.object_editor[i];
-                    //var property_name = field_config.field_name;
-                    //html += crud.renderEditorField(obj_full_id, property_name);
-                    var field_component = new CrudEditorFieldInput(obj_full_id, field_config.field_name, field_config.widget.params );
-                    this.$.fields_container.appendChild(field_component);
+                        Polymer.dom(this).appendChild(field_component);
+                    }
                 }
+            }),
 
-                //this.$.fields_container.innerHTML = html;
+            backToTable: function () {
+                var obj_full_id = this.obj_full_id;
+                var obj = storage.getObject(obj_full_id);
+                var class_name = obj._class_name;
+                crud.showClassObjectsList(class_name);
             },
 
-            ready: function(){
-                //console.log('ready');
+            saveEditor: function () {
+                var obj_full_id = this.obj_full_id;
+                var obj = storage.getObject(obj_full_id);
+
+                var crud_config_for_class = crud.config[obj._class_name];
+                for (var i = 0; i < crud_config_for_class.editor.length; i++) {
+                    var field_config = crud_config_for_class.editor[i];
+                    var property_name = field_config.field_name;
+
+                    var field_editor_element = document.querySelector('.editor_field__' + property_name);
+                    var field_value = field_editor_element.value;
+                    console.log(field_value);
+
+                    var data = {};
+                    data.object_class_name = obj._class_name;
+                    data.object_id = obj.id;
+                    data.field_name = property_name;
+                    data.field_value = field_value;
+
+                    socket.emit('update_object_field', data);
+                }
             }
-        });
+        };
     </script>
 
 </dom-module>

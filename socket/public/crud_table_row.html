@@ -15,15 +15,30 @@
     </template>
 
     <script>
-        CrudTableRow = Polymer({
+        var CrudTableRow = Polymer({
             is: "crud-table-row",
 
-            factoryImpl: function (full_obj_id) {
+            factoryImpl: function (full_obj_id, crud_table_component) {
                 var obj = storage.getObject(full_obj_id);
-                var obj_class_name = obj._class_name;
 
-                var class_config = crud.crud_config[obj_class_name];
-                var list_config = class_config.objects_list;
+                var obj_class_name = obj._class_name;
+                var class_config = crud.config[obj_class_name];
+                var list_config = class_config.table;
+
+                /*
+                if (list_config.group_by){
+                    var group_by_field_name = list_config.group_by;
+                    var group_by_field_value = obj[group_by_field_name];
+                    if (crud_table_component.last_group_by_value != group_by_field_value){
+                        var ne = document.createElement('div');
+                        ne.textContent = group_by_field_value;
+
+                        Polymer.dom(this.$.row).appendChild(ne);
+                    }
+
+                    crud_table_component.last_group_by_value = group_by_field_value;
+                }
+                */
 
                 for (var i in list_config.columns) {
                     var field_config = list_config.columns[i];
@@ -37,7 +52,7 @@
                         }
                     }
 
-                    this.$.row.appendChild(new_cell_component);
+                    Polymer.dom(this.$.row).appendChild(new_cell_component);
                 }
             },
 
