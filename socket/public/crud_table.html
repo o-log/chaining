@@ -8,7 +8,6 @@
 
     <template>
         <div>
-            <h1><a href="#" onclick="return crudClassesList.show();">классы</a> / <span id="title"></span></h1>
             <div id="list_meta" style="padding: 10px; background-color: #ddd; text-align: right;"><span id="loaded_count"></span></div>
             <div>
                 <content></content>
@@ -25,8 +24,8 @@
             //_obj_class_name: '',
 
             factoryImpl: function(class_name) {
-                //this._obj_class_name = class_name;
-                this.$.title.textContent = crud.getClassTitleByName(class_name);
+
+                document.querySelector('.mdl-layout-title').innerHTML = '<a href="#" onclick="return crudClassesList.show();">классы</a>' +  ' > <span>' + crud.getClassTitleByName(class_name) + '</span>';
 
                 var class_config = crud.config[class_name];
                 var table_config = class_config.table;

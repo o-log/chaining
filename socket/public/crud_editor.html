@@ -7,12 +7,6 @@
 
     <template>
         <div id="crud_obj_editor">
-            <h1>
-                <a href="#" onclick="return crudClassesList.show();">классы</a> / <a href="#" id="back_to_table_link"
-                                                                                     onclick="return crudEditor.backToTable();"></a>
-                / EDITOR
-            </h1>
-
             <div><content></content></div>
             <div style="text-align: right;">
                 <paper-button raised onclick="crudEditor.saveEditor();">Сохранить</paper-button>
@@ -33,9 +27,6 @@
 
                     var obj = storage.getObject(obj_full_id);
 
-                    var class_name = obj._class_name;
-                    this.$.back_to_table_link.textContent = class_name;
-
                     var crud_config_for_class = crud.config[obj._class_name];
                     for (var i = 0; i < crud_config_for_class.editor.length; i++) {
                         var field_config = crud_config_for_class.editor[i];
@@ -55,12 +46,14 @@
                 }
             }),
 
+            /*
             backToTable: function () {
                 var obj_full_id = this.obj_full_id;
                 var obj = storage.getObject(obj_full_id);
                 var class_name = obj._class_name;
                 crud.showClassObjectsList(class_name);
             },
+            */
 
             saveEditor: function () {
                 var obj_full_id = this.obj_full_id;

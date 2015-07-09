@@ -211,8 +211,14 @@ var crud = {
         //var editor_html = crud.renderEditorForObjFullId(obj_full_id);
         var editor_component = new crudEditor.component(obj_full_id);
 
-        document.querySelector('#page-content').innerHTML = '';
-        document.querySelector('#page-content').appendChild(editor_component);
+        //document.querySelector('#page-content').innerHTML = '';
+        //document.querySelector('#page-content').appendChild(editor_component);
+        document.querySelector('#crud-editor-content').innerHTML = '';
+        document.querySelector('#crud-editor-content').appendChild(editor_component);
+
+        document.querySelector('#page-content').style.width = '20%';
+        document.querySelector('#crud-editor-content').style.width = '70%';
+
 
         return false;
     }

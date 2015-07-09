@@ -8,10 +8,7 @@
 
     <template>
         <div>
-            <h1 id="title">классы</h1>
-            <div>
-                <content></content>
-            </div>
+            <content></content>
         </div>
     </template>
 
@@ -21,6 +18,8 @@
                 var classes_list_component = new crudClassesList.component();
                 document.querySelector('#page-content').innerHTML = '';
                 document.querySelector('#page-content').appendChild(classes_list_component);
+
+                document.querySelector('.mdl-layout-title').textContent = 'классы';
 
                 return false;
             },

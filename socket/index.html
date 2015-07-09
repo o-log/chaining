@@ -1,20 +1,21 @@
 <!doctype html>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        body {
-            font-family: "RobotoDraft",Helvetica,Arial,sans-serif;
-            padding: 50px;
-        }
         #page-content{
+            padding: 30px;
         }
-        a {
-            color: #666666;
-            text-decoration: none;
+        #crud-editor-content{
+            padding: 30px;
         }
     </style>
-</head>
+
 <body>
+
+<link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.0/material.indigo-pink.min.css">
+<script src="https://storage.googleapis.com/code.getmdl.io/1.0.0/material.min.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"></head>
 
 <script>
     // Document-level global Polymer settings can be set by creating a Polymer object on window before importing the Polymer library
@@ -46,7 +47,37 @@
 <link rel="import" href="public/crud_editor_field_input.html">
 <link rel="import" href="public/crud_editor_field_textarea.html">
 
-<div id="page-content"></div>
+<!--<div id="page-content"></div>-->
+
+<body>
+
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+            <span class="mdl-layout-title">Title</span>
+        </div>
+    </header>
+    <div class="mdl-layout__drawer">
+        <span class="mdl-layout-title">Title</span>
+        <nav class="mdl-navigation">
+            <a class="mdl-navigation__link" href="">Link</a>
+            <a class="mdl-navigation__link" href="">Link</a>
+            <a class="mdl-navigation__link" href="">Link</a>
+            <a class="mdl-navigation__link" href="">Link</a>
+        </nav>
+    </div>
+    <main class="mdl-layout__content">
+        <div class="page-content">
+            <div id="page-content" style="display: inline-block; vertical-align: top; width: 70%; background-color: #fff;">
+                234
+            </div><div id="crud-editor-content" style="display: inline-block; vertical-align: top; width: 20%; background-color: #eee;">
+                123
+            </div>
+
+        </div>
+    </main>
+</div>
+
 
 <script>
 
