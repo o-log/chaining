@@ -1,0 +1,22 @@
+{
+  "name": "block",
+  "plural": "blocks",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true,
+    "mysql": {
+      "table": "blocks"
+    }
+  },
+  "properties": {
+    "info": {
+      "type": "string",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}
