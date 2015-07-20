@@ -1,0 +1,43 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<dom-module id="crud-table-filter">
+
+    <!-- scoped CSS for this element -->
+    <style>
+        #input {width: 80px;}
+    </style>
+
+    <template>
+        <div>
+            <span id="field_name"></span>
+            <input id="input">
+        </div>
+    </template>
+
+    <script>
+        var CrudTableFilter = {
+
+            component: Polymer({
+                is: "crud-table-filter",
+
+                factoryImpl: function (table_component, class_name, search_field_name, value) {
+                    this.$.field_name.textContent = search_field_name;
+
+                    this.$.input.value = value;
+                    this.$.input.dataset.class_name = class_name;
+                    this.$.input.dataset.field_name = search_field_name;
+                    this.$.input.onkeyup = function () {
+                        //var filter_string = this.value;
+
+                        var crud_table_class_name = this.dataset.class_name;
+                        //var search_field_name = this.dataset.field_name;
+                        var table_component = CrudTable.getTableForInnerElement(this);
+
+                        CrudTable.apiQuery(table_component, crud_table_class_name, 0);
+                    };
+                }
+            })
+        };
+    </script>
+
+</dom-module>

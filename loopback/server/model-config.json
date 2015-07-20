@@ -40,6 +40,26 @@
     "dataSource": "db-news",
     "public": true
   },
+  "poll": {
+    "dataSource": "db-news",
+    "public": true
+  },
+  "poll_answer": {
+    "dataSource": "db-news",
+    "public": true
+  },
+  "tv_channel": {
+    "dataSource": "db-news",
+    "public": true
+  },
+  "node": {
+    "dataSource": "db-news",
+    "public": true
+  },
+  "game_media": {
+    "dataSource": "db-stats",
+    "public": true
+  },
   "adminlog": {
     "dataSource": "db-news",
     "public": true

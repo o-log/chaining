@@ -1,36 +1,28 @@
 {
-  "name": "block",
-  "plural": "blocks",
+  "name": "game_media",
+  "plural": "game_media",
   "base": "PersistedModel",
   "idInjection": true,
   "options": {
     "validateUpsert": true,
     "mysql": {
-      "table": "blocks"
+      "table": "game_media"
     }
   },
   "properties": {
-    "info": {
-      "type": "string",
-      "required": true
-    },
-    "region": {
+    "nid": {
       "type": "string",
       "required": false
     },
-    "pages": {
+    "game_id": {
       "type": "string",
       "required": false
     },
-    "body": {
+    "role": {
       "type": "string",
       "required": false
     },
     "title": {
-      "type": "string",
-      "required": false
-    },
-    "weight": {
       "type": "string",
       "required": false
     }

@@ -1,36 +1,32 @@
 {
-  "name": "block",
-  "plural": "blocks",
+  "name": "node",
+  "plural": "node",
   "base": "PersistedModel",
   "idInjection": true,
   "options": {
     "validateUpsert": true,
     "mysql": {
-      "table": "blocks"
+      "table": "node"
     }
   },
   "properties": {
-    "info": {
+    "nid": {
       "type": "string",
-      "required": true
-    },
-    "region": {
-      "type": "string",
-      "required": false
-    },
-    "pages": {
-      "type": "string",
-      "required": false
-    },
-    "body": {
-      "type": "string",
-      "required": false
+      "id": true
     },
     "title": {
       "type": "string",
       "required": false
     },
-    "weight": {
+    "type": {
+      "type": "string",
+      "required": false
+    },
+    "url_alias": {
+      "type": "string",
+      "required": false
+    },
+    "created": {
       "type": "string",
       "required": false
     }

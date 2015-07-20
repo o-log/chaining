@@ -1,36 +1,28 @@
 {
-  "name": "block",
-  "plural": "blocks",
+  "name": "poll",
+  "plural": "poll",
   "base": "PersistedModel",
   "idInjection": true,
   "options": {
     "validateUpsert": true,
     "mysql": {
-      "table": "blocks"
+      "table": "poll"
     }
   },
   "properties": {
-    "info": {
-      "type": "string",
-      "required": true
-    },
-    "region": {
+    "node_id": {
       "type": "string",
       "required": false
     },
-    "pages": {
+    "question": {
       "type": "string",
       "required": false
     },
-    "body": {
+    "published": {
       "type": "string",
       "required": false
     },
-    "title": {
-      "type": "string",
-      "required": false
-    },
-    "weight": {
+    "created_at": {
       "type": "string",
       "required": false
     }

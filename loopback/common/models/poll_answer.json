@@ -1,36 +1,24 @@
 {
-  "name": "block",
-  "plural": "blocks",
+  "name": "poll_answer",
+  "plural": "poll_answer",
   "base": "PersistedModel",
   "idInjection": true,
   "options": {
     "validateUpsert": true,
     "mysql": {
-      "table": "blocks"
+      "table": "poll_answer"
     }
   },
   "properties": {
-    "info": {
-      "type": "string",
-      "required": true
-    },
-    "region": {
+    "poll_id": {
       "type": "string",
       "required": false
     },
-    "pages": {
+    "answer_text": {
       "type": "string",
       "required": false
     },
-    "body": {
-      "type": "string",
-      "required": false
-    },
-    "title": {
-      "type": "string",
-      "required": false
-    },
-    "weight": {
+    "likes_count": {
       "type": "string",
       "required": false
     }

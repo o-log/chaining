@@ -1,36 +1,28 @@
 {
-  "name": "block",
-  "plural": "blocks",
+  "name": "tv_channel",
+  "plural": "tv_channel",
   "base": "PersistedModel",
   "idInjection": true,
   "options": {
     "validateUpsert": true,
     "mysql": {
-      "table": "blocks"
+      "table": "tv_channel"
     }
   },
   "properties": {
-    "info": {
-      "type": "string",
-      "required": true
-    },
-    "region": {
+    "name": {
       "type": "string",
       "required": false
     },
-    "pages": {
+    "servicetv_id": {
       "type": "string",
       "required": false
     },
-    "body": {
+    "block_id": {
       "type": "string",
       "required": false
     },
-    "title": {
-      "type": "string",
-      "required": false
-    },
-    "weight": {
+    "logo": {
       "type": "string",
       "required": false
     }
