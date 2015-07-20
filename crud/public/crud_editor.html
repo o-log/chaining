@@ -1,0 +1,140 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<dom-module id="crud-editor">
+
+    <style>
+        :host {
+            display: block;
+            background-color: #eee;
+        }
+        #crud_obj_editor {
+            padding: 20px;
+        }
+        #title {
+            font-weight: bold;
+        }
+
+        iron-pages > div {
+            border-top: 2px solid #ccc;
+        }
+    </style>
+
+    <template>
+        <div id="crud_obj_editor">
+            <div id="title"></div>
+            <paper-tabs id="tabs" selected="0">
+            </paper-tabs>
+            <iron-pages id="pages" selected="0">
+                <div>
+                    <content></content>
+                    <div style="text-align: right;">
+                        <paper-button raised onclick="return crudEditor.saveEditor();">Сохранить</paper-button>
+                    </div>
+                </div>
+            </iron-pages>
+        </div>
+    </template>
+
+    <script>
+
+        var crudEditor = {
+            obj_full_id: '', // TODO: avoid global variable, store obj id to editor component
+
+            component: Polymer({
+                is: "crud-editor",
+
+                factoryImpl: function (obj_full_id) {
+                    crudEditor.obj_full_id = obj_full_id;
+
+                    var obj = storage.getObject(obj_full_id);
+
+                    this.$.title.textContent = Model.getTitleForObj(obj);
+
+                    var crud_config_for_class = crud.config[obj._class_name];
+                    for (var i = 0; i < crud_config_for_class.editor.length; i++) {
+                        var field_config = crud_config_for_class.editor[i];
+
+                        var field_component = null;
+                        switch(field_config.widget.name){
+                            case 'input':
+                                field_component = new CrudEditorFieldInput(obj_full_id, field_config.field_name, field_config.widget.params);
+                                break;
+                            case 'textarea':
+                                field_component = new CrudEditorFieldTextarea(obj_full_id, field_config.field_name, field_config.widget.params);
+                                break;
+                        }
+
+                        Polymer.dom(this).appendChild(field_component);
+                    }
+
+                    var tab_index = 0; // вся жесть вокруг tab_index изза почемуто невозможности выбрать список табов нормальным селектором и навесить онклики
+
+                    var pages = this.$.pages;
+
+                    var tab = document.createElement("paper-tab");
+                    tab.textContent = 'данные';
+                    Polymer.dom(this.$.tabs).appendChild(tab);
+                    tab.dataset.page_index = tab_index;
+                    tab.onclick = function(){
+                        pages.selected = this.dataset.page_index;
+                    };
+                    tab_index++;
+
+                    if (crud_config_for_class.linked_models){
+                        for (var i in crud_config_for_class.linked_models){
+                            var linked_model_config = crud_config_for_class.linked_models[i];
+                            var linked_class_name = linked_model_config.class_name;
+                            var link_field = linked_model_config.reference_field;
+                            var filters_arr = {};
+                            filters_arr[link_field] = Model.getIdForObj(obj);
+
+                            var list = new CrudTable.component(linked_class_name, filters_arr);
+                            //crud.lists[class_name] = list;
+
+                            var div = document.createElement("div");
+                            div.appendChild(list);
+
+                            Polymer.dom(this.$.pages).appendChild(div);
+
+                            var tab = document.createElement("paper-tab");
+                            tab.dataset.page_index = tab_index;
+                            tab.onclick = function(){
+                                pages.selected = this.dataset.page_index;
+                            };
+
+
+                            tab.textContent = crud.getClassTitleByName(linked_class_name);
+                            Polymer.dom(this.$.tabs).appendChild(tab);
+
+                            tab_index++;
+                        }
+                    }
+                }
+            }),
+
+            saveEditor: function () {
+                var obj_full_id = this.obj_full_id;
+                var obj = storage.getObject(obj_full_id);
+
+                var crud_config_for_class = crud.config[obj._class_name];
+                for (var i = 0; i < crud_config_for_class.editor.length; i++) {
+                    var field_config = crud_config_for_class.editor[i];
+                    var property_name = field_config.field_name;
+
+                    var field_editor_element = document.querySelector('.editor_field__' + property_name);
+                    var field_value = field_editor_element.value;
+                    console.log(field_value);
+
+                    var data = {};
+                    data.object_class_name = obj._class_name;
+                    data.object_id = obj.id;
+                    data.field_name = property_name;
+                    data.field_value = field_value;
+
+                    socket.emit('update_object_field', data);
+                }
+            }
+        };
+    </script>
+
+</dom-module>

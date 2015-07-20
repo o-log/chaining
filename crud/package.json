@@ -1,0 +1,8 @@
+{
+  "name": "CRUD",
+  "version": "0.0.1",
+  "description": "CRUD",
+  "dependencies": {
+    "express": "^4.13.0"
+  }
+}

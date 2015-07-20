@@ -1,0 +1,26 @@
+{
+  "name": "socket",
+  "main": "index.js",
+  "version": "0.0.0",
+  "homepage": "https://github.com/o-log/chaining",
+  "authors": [
+    "Oleg Loginov <olognv@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0",
+    "paper-button": "PolymerElements/paper-button#^1.0.0",
+    "paper-input": "PolymerElements/paper-input#^1.0.0",
+    "paper-drawer-panel": "PolymerElements/paper-drawer-panel#^1.0.2",
+    "paper-styles": "PolymerElements/paper-styles#^1.0.7",
+    "iron-pages": "PolymerElements/iron-pages#~1.0.2",
+    "paper-tabs": "PolymerElements/paper-tabs#~1.0.1"
+  }
+}

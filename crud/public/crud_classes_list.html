@@ -1,0 +1,68 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<dom-module id="crud-classes-list">
+
+    <!-- scoped CSS for this element -->
+    <style>
+        :host {
+            display: block;
+        }
+
+        :host.collapsed {
+            padding: 5px;
+            font-size: 10px;
+        }
+
+        #list_container {
+            display: inline-block;
+            vertical-align: top;
+            width: 10%;
+            padding: 10px;
+        }
+
+        #children_container {
+            display: inline-block;
+            vertical-align: top;
+            width: 85%;
+        }
+    </style>
+
+    <template>
+        <div id="list_container">
+            <content></content>
+        </div>
+        <div id="children_container"></div>
+    </template>
+
+    <script>
+        var crudClassesList = {
+            updateChildren: function(list_element, list) {
+
+                var children_container = $(list_element).children('#children_container')[0];
+                children_container.innerHTML = '';
+                children_container.appendChild(list)
+
+            },
+
+            show: function () {
+                var classes_list_component = new crudClassesList.component();
+                document.querySelector('#page-content').appendChild(classes_list_component);
+
+                return false;
+            },
+
+            component: Polymer({
+                is: "crud-classes-list",
+
+                ready: function () {
+                    for (var class_name in crud.config) {
+                        var row_component = new CrudClassesListRow.component(class_name);
+
+                        Polymer.dom(this).appendChild(row_component);
+                    }
+                }
+            })
+        };
+    </script>
+
+</dom-module>

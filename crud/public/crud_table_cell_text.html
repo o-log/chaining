@@ -1,0 +1,54 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<dom-module id="crud-table-cell-text">
+
+    <style>
+        #cell {
+            display: inline-block;
+        }
+    </style>
+
+    <template>
+        <div id="cell">
+        </div>
+    </template>
+
+    <script>
+        var CrudTableCell_text = Polymer({
+            is: "crud-table-cell-text",
+
+
+            factoryImpl: function (full_obj_id, field_name, widget_params, crud_table_component) {
+                var obj = storage.getObject(full_obj_id);
+
+                var field_value = obj[field_name];
+
+                // default, may be overwritten later
+                this.$.cell.textContent = field_value;
+
+                if (widget_params) {
+                    if (widget_params.edit_link) {
+                        this.$.cell.textContent = '';
+
+                        var a_element = document.createElement('a');
+                        a_element.dataset.crud_obj_full_id = full_obj_id;
+                        a_element.onclick = crud.crudObjectInListOnClick;
+                        a_element.href = "#";
+
+                        if (!field_value) {
+                            field_value = 'NO_VALUE'
+                        }
+                        a_element.textContent = field_value;
+
+                        this.$.cell.appendChild(a_element);
+                    }
+                }
+            },
+
+            ready: function () {
+                //console.log('ready');
+            }
+        });
+    </script>
+
+</dom-module>

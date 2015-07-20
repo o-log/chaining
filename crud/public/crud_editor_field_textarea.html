@@ -1,0 +1,33 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<dom-module id="crud-editor-field-textarea">
+
+    <style>
+    </style>
+
+    <template>
+        <div>
+            <paper-textarea id="input"></paper-textarea>
+        </div>
+    </template>
+
+    <script>
+        CrudEditorFieldTextarea = Polymer({
+            is: "crud-editor-field-textarea",
+
+            factoryImpl: function(obj_full_id, field_name, widget_params) {
+
+                var obj = storage._obj_arr[obj_full_id];
+
+                this.$.input.value = obj[field_name];
+                this.$.input.label = field_name;
+                this.$.input.className += ' editor_field__' + field_name;
+            },
+
+            ready: function(){
+                //console.log('ready');
+            }
+        });
+    </script>
+
+</dom-module>

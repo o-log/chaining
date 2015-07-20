@@ -1,0 +1,159 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<dom-module id="crud-table">
+
+    <!-- scoped CSS for this element -->
+    <style>
+        :host {
+            display: block;
+            width: 100%;
+            background-color: white;
+        }
+
+        #table_container {
+            display: inline-block;
+            vertical-align: top;
+            padding: 10px;
+            width: 90%;
+        }
+
+        #table_container.narrow {
+            width: 15%;
+        }
+
+        #children_container {
+            display: inline-block;
+            vertical-align: top;
+        }
+
+        #children_container.wide {
+            width: 80%;
+        }
+    </style>
+
+    <template>
+            <div id="table_container">
+                <div>
+                    <div style="font-weight: bold;" id="title">TITLE</div>
+                </div>
+                <div id="list_meta" style="padding: 10px; background-color: #ddd; text-align: right;"><span
+                        id="loaded_count"></span></div>
+                <content></content>
+            </div>
+            <div id="children_container">
+            </div>
+    </template>
+
+    <script>
+        var CrudTable = {
+            updateChildren: function(table_element, editor_component) {
+                var children_container = $(table_element).children('#children_container')[0];
+                var table_container = $(table_element).children('#table_container')[0];
+                //document.querySelector('#page-content').appendChild(editor_component);
+                children_container.innerHTML = '';
+                children_container.appendChild(editor_component);
+
+                children_container.classList.add('wide');
+                table_container.classList.add('narrow');
+            },
+
+            component: Polymer({
+                is: "crud-table",
+
+                factoryImpl: function (class_name, filters_arr) {
+                    this.$.list_meta.dataset.class_name = class_name;
+                    this.$.title.textContent = crud.getClassTitleByName(class_name);
+
+                    CrudTable.renderFilters(class_name, this, filters_arr);
+
+                    CrudTable.apiQuery(this, class_name);
+                }
+            }),
+
+            apiQuery: function(table_component, class_name, limit){
+                Polymer.dom(table_component).innerHTML = '';
+
+                var api_url = 'localhost:3001';
+                if (!limit){
+                    limit = 300;
+                }
+
+                var query_url = 'http://' + api_url + '/api/' + class_name;
+                query_url += '?1=1';
+
+                query_url += '&filter[limit]=' + limit;
+
+                var filters = $(table_component.$.list_meta).find('input');
+                if (filters.length) {
+                    for (var i = 0; i < filters.length; i++) {
+                        var filter_element = filters[i];
+                        var filter_field_name = filter_element.dataset.field_name;
+                        var filter_value = filter_element.value;
+                        if (filter_value) {
+                            query_url += '&filter[where][' + filter_field_name + ']=' + filter_value;
+                        }
+                    }
+                }
+
+                $.ajax({
+                    url: query_url, success: function (data) {
+                        CrudTable.tableSuccess(data, table_component); // do not pass THIS - may be missing
+                    }
+                });
+            },
+
+            tableSuccess: function (data, table_component) {
+                var class_name = CrudTable.getClassNameForTableComponent(table_component);
+                table_component.$.title.textContent = crud.getClassTitleByName(class_name) + ' (' + data.length + ')';
+
+                for (var i in data){
+                    var obj = data[i];
+                    CrudTable.addObject(obj, table_component);
+                }
+            },
+
+            addObject: function (obj, table_component) {
+                var class_name = table_component.$.list_meta.dataset.class_name;
+                obj._class_name = class_name;
+
+                var obj_full_id = Model.getFullIdForObj(obj);
+                storage.setObject(obj_full_id, obj);
+
+                var new_block_component = new CrudTableRow(obj_full_id, table_component);
+                Polymer.dom(table_component).appendChild(new_block_component); // appends to <content>
+            },
+
+            getTableForInnerElement: function (element){
+                return $(element).parents('crud-table')[0];
+            },
+
+            getClassNameForTableComponent: function(table_component){
+                return table_component.$.list_meta.dataset.class_name;
+            },
+
+            renderFilters: function (class_name, self_component, filters_arr) {
+                var class_config = crud.config[class_name];
+                var table_config = class_config.table;
+
+                if (table_config.search_fields) {
+                    for (var i in table_config.search_fields) {
+                        var search_field_config = table_config.search_fields[i];
+                        var search_field_name = search_field_config.field_name;
+                        var search_field_value = '';
+
+                        if (filters_arr){
+                            if (filters_arr[search_field_name]){
+                                search_field_value = filters_arr[search_field_name];
+                            }
+                        }
+
+                        var filter_component = new CrudTableFilter.component(self_component, class_name, search_field_name, search_field_value);
+
+                        Polymer.dom(self_component.$.list_meta).appendChild(filter_component);
+                    }
+                }
+            }
+        };
+    </script>
+
+</dom-module>
