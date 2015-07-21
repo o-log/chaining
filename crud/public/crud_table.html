@@ -5,13 +5,17 @@
     <!-- scoped CSS for this element -->
     <style>
         :host {
-            display: block;
+            display: table;
             width: 100%;
             background-color: white;
         }
 
+        #title {
+            font-weight: bold;
+        }
+
         #table_container {
-            display: inline-block;
+            display: table-cell;
             vertical-align: top;
             padding: 10px;
             width: 90%;
@@ -19,137 +23,223 @@
 
         #table_container.narrow {
             width: 15%;
+            background-color: #f9f9f9;
         }
 
         #children_container {
-            display: inline-block;
+            display: table-cell;
             vertical-align: top;
         }
 
         #children_container.wide {
-            width: 80%;
+        }
+
+        #controls {
+            padding: 10px 0 10px 0;
+            /*background-color: #eee;*/
+            display: none;
+        }
+
+        #controls.visible {
+            display: block;
+        }
+
+        #toggle_filters {
+            cursor: pointer;
+            font-size: 10px;
         }
     </style>
 
     <template>
+        <div style="display: table-row;">
             <div id="table_container">
                 <div>
-                    <div style="font-weight: bold;" id="title">TITLE</div>
+                    <!--<span id="title">TITLE</span>-->
+                    <span id="toggle_filters"
+                          on-click="crud_toggleFilters">&#x2630;</span>
                 </div>
-                <div id="list_meta" style="padding: 10px; background-color: #ddd; text-align: right;"><span
-                        id="loaded_count"></span></div>
-                <content></content>
+
+                <div id="controls">
+                    <div id="filters"></div>
+                    <div id="orders"></div>
+                </div>
+                <div id="list_container">
+                </div>
             </div>
             <div id="children_container">
             </div>
+        </div>
     </template>
 
     <script>
         var CrudTable = {
-            updateChildren: function(table_element, editor_component) {
-                var children_container = $(table_element).children('#children_container')[0];
-                var table_container = $(table_element).children('#table_container')[0];
-                //document.querySelector('#page-content').appendChild(editor_component);
-                children_container.innerHTML = '';
-                children_container.appendChild(editor_component);
-
-                children_container.classList.add('wide');
-                table_container.classList.add('narrow');
-            },
-
             component: Polymer({
                 is: "crud-table",
 
-                factoryImpl: function (class_name, filters_arr) {
-                    this.$.list_meta.dataset.class_name = class_name;
-                    this.$.title.textContent = crud.getClassTitleByName(class_name);
+                crud_toggleFilters: function() {
+                    Polymer.dom(this.$.controls).classList.toggle('visible');
+                },
+
+                factoryImpl: function (class_name, filters_arr, orders_arr) {
+                    this.$.filters.dataset.class_name = class_name;
+                    //this.$.title.textContent = crud.getClassTitleByName(class_name);
 
                     CrudTable.renderFilters(class_name, this, filters_arr);
+                    CrudTable.renderOrders(class_name, this, orders_arr);
 
-                    CrudTable.apiQuery(this, class_name);
-                }
+                    this.apiQuery(class_name);
+                },
+
+                crud_replaceChildren: function (editor_component) {
+                    var children_container = this.$.children_container;
+                    var table_container = this.$.table_container;
+
+                    children_container.innerHTML = '';
+                    children_container.appendChild(editor_component);
+
+                    children_container.classList.add('wide');
+                    table_container.classList.add('narrow');
+                },
+
+                appendWhereFilters: function (query_url) {
+                    var filters = this.$.filters.querySelectorAll('crud-table-filter');
+                    if (filters.length) {
+                        for (var i = 0; i < filters.length; i++) {
+                            var filter_element = filters[i];
+                            var filter_field_name = filter_element.crud_field_name;
+                            var filter_value = filter_element.crud_field_value;
+                            if (filter_value) {
+                                query_url += '&filter[where][' + filter_field_name + ']=' + filter_value;
+                            }
+                        }
+                    }
+
+                    return query_url;
+                },
+
+                apiQuery: function (class_name, limit) {
+                    Polymer.dom(this.$.list_container).innerHTML = '';
+
+                    var api_url = 'localhost:3001';
+                    if (!limit) {
+                        limit = 300;
+                    }
+
+                    var query_url = 'http://' + api_url + '/api/' + class_name;
+                    query_url += '?1=1';
+
+                    query_url += '&filter[limit]=' + limit;
+
+                    query_url = this.appendWhereFilters(query_url);
+                    query_url = CrudTable.appendOrderFIlters(this, query_url);
+
+                    var table_component = this;
+
+                    $.ajax({
+                        url: query_url, success: function (data) {
+                            CrudTable.tableSuccess(data, table_component); // do not pass THIS - may be missing
+                        }
+                    });
+                },
+
+
             }),
 
-            apiQuery: function(table_component, class_name, limit){
-                Polymer.dom(table_component).innerHTML = '';
 
-                var api_url = 'localhost:3001';
-                if (!limit){
-                    limit = 300;
-                }
-
-                var query_url = 'http://' + api_url + '/api/' + class_name;
-                query_url += '?1=1';
-
-                query_url += '&filter[limit]=' + limit;
-
-                var filters = $(table_component.$.list_meta).find('input');
+            appendOrderFIlters: function (table_component, query_url) {
+                var filters = $(table_component.$.orders).find('paper-checkbox');
                 if (filters.length) {
                     for (var i = 0; i < filters.length; i++) {
                         var filter_element = filters[i];
                         var filter_field_name = filter_element.dataset.field_name;
-                        var filter_value = filter_element.value;
-                        if (filter_value) {
-                            query_url += '&filter[where][' + filter_field_name + ']=' + filter_value;
+                        //var filter_value = filter_element.value;
+                        if (filter_element.checked) {
+                            query_url += '&filter[order]=' + filter_field_name + '%20DESC';
                         }
                     }
                 }
 
-                $.ajax({
-                    url: query_url, success: function (data) {
-                        CrudTable.tableSuccess(data, table_component); // do not pass THIS - may be missing
-                    }
-                });
+                return query_url;
             },
 
             tableSuccess: function (data, table_component) {
-                var class_name = CrudTable.getClassNameForTableComponent(table_component);
-                table_component.$.title.textContent = crud.getClassTitleByName(class_name) + ' (' + data.length + ')';
+                //var class_name = CrudTable.getClassNameForTableComponent(table_component);
+                //table_component.$.title.textContent = crud.getClassTitleByName(class_name) + ' (' + data.length + ')';
 
-                for (var i in data){
+                for (var i in data) {
                     var obj = data[i];
                     CrudTable.addObject(obj, table_component);
                 }
             },
 
             addObject: function (obj, table_component) {
-                var class_name = table_component.$.list_meta.dataset.class_name;
+                var class_name = table_component.$.filters.dataset.class_name;
                 obj._class_name = class_name;
 
                 var obj_full_id = Model.getFullIdForObj(obj);
                 storage.setObject(obj_full_id, obj);
 
                 var new_block_component = new CrudTableRow(obj_full_id, table_component);
-                Polymer.dom(table_component).appendChild(new_block_component); // appends to <content>
+                Polymer.dom(table_component.$.list_container).appendChild(new_block_component); // appends to <content>
             },
 
-            getTableForInnerElement: function (element){
+            getTableForInnerElement: function (element) {
                 return $(element).parents('crud-table')[0];
             },
 
-            getClassNameForTableComponent: function(table_component){
-                return table_component.$.list_meta.dataset.class_name;
+            getClassNameForTableComponent: function (table_component) {
+                return table_component.$.filters.dataset.class_name;
             },
 
             renderFilters: function (class_name, self_component, filters_arr) {
                 var class_config = crud.config[class_name];
                 var table_config = class_config.table;
 
-                if (table_config.search_fields) {
+                if ('search_fields' in table_config) {
                     for (var i in table_config.search_fields) {
                         var search_field_config = table_config.search_fields[i];
                         var search_field_name = search_field_config.field_name;
+
                         var search_field_value = '';
 
-                        if (filters_arr){
-                            if (filters_arr[search_field_name]){
+                        // сначала берем дефолтное значение фильтра из конфига
+                        if ('value' in search_field_config) {
+                            var search_field_value = search_field_config.value;
+                        }
+
+                        // потом берем переопределенное значение фильтра (если таблица создается программно и фильтр определяется контекстом)
+                        if (filters_arr) {
+                            if (filters_arr[search_field_name]) {
                                 search_field_value = filters_arr[search_field_name];
                             }
                         }
 
                         var filter_component = new CrudTableFilter.component(self_component, class_name, search_field_name, search_field_value);
 
-                        Polymer.dom(self_component.$.list_meta).appendChild(filter_component);
+                        Polymer.dom(self_component.$.filters).appendChild(filter_component);
+                    }
+                }
+            },
+
+            renderOrders: function (class_name, self_component, orders_arr) {
+                var class_config = crud.config[class_name];
+                var table_config = class_config.table;
+
+                if (table_config.order_fields) {
+                    for (var i in table_config.order_fields) {
+                        var order_field_config = table_config.order_fields[i];
+                        var order_field_name = order_field_config.field_name;
+                        var order_field_value = '';
+
+                        if (orders_arr) {
+                            if (filters_arr[order_field_name]) {
+                                order_field_value = filters_arr[order_field_name];
+                            }
+                        }
+
+                        var filter_component = new CrudTableOrder.component(self_component, class_name, order_field_name, order_field_value);
+
+                        Polymer.dom(self_component.$.orders).appendChild(filter_component);
                     }
                 }
             }

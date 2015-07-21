@@ -5,7 +5,15 @@
     <style>
         #cell {
             display: inline-block;
+            font-family: Roboto;
+            font-size: 16px;
         }
+
+        a {
+            text-decoration: none;
+            color: #009688;
+        }
+
     </style>
 
     <template>
@@ -18,7 +26,7 @@
             is: "crud-table-cell-text",
 
 
-            factoryImpl: function (full_obj_id, field_name, widget_params, crud_table_component) {
+            factoryImpl: function (full_obj_id, field_name, widget_params, crud_table_component, table_row_polymer) {
                 var obj = storage.getObject(full_obj_id);
 
                 var field_value = obj[field_name];
@@ -32,7 +40,28 @@
 
                         var a_element = document.createElement('a');
                         a_element.dataset.crud_obj_full_id = full_obj_id;
-                        a_element.onclick = crud.crudObjectInListOnClick;
+                        //a_element.onclick = crud.crudObjectInListOnClick;
+
+                        a_element.onclick = function () {
+                            var obj_full_id = $(this).data('crud_obj_full_id');
+
+                            var table_element = crud_table_component;
+
+                            /*
+                            var rows = $(table_element).find('crud-table-row');
+                            $(rows).removeClass('active');
+                            */
+
+                            table_row_polymer.setActive();
+
+                            var editor_component = new crudEditor.component(obj_full_id);
+                            crud_table_component.crud_replaceChildren(editor_component);
+                            //Polymer.dom.flush();
+
+                            return false;
+                        };
+
+
                         a_element.href = "#";
 
                         if (!field_value) {

@@ -3,6 +3,9 @@
 <dom-module id="crud-editor-field-textarea">
 
     <style>
+        :host {
+            /*margin-top: 15px; margin-bottom: 15px; *//* fix displaying bug */
+        }
     </style>
 
     <template>
@@ -22,10 +25,6 @@
                 this.$.input.value = obj[field_name];
                 this.$.input.label = field_name;
                 this.$.input.className += ' editor_field__' + field_name;
-            },
-
-            ready: function(){
-                //console.log('ready');
             }
         });
     </script>

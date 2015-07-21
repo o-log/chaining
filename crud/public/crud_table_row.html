@@ -4,9 +4,16 @@
 
     <!-- scoped CSS for this element -->
     <style>
-        div#row {
-            padding: 4px;
-            border-bottom: 1px solid #ccc;
+        :host {
+            display: block;
+            padding: 5px 0 5px 0;
+        }
+
+        #row.active {
+            background-color: #eee;
+            margin: 0px -10px 0px -10px;
+            padding-left: 10px;
+            padding-right: 10px;
         }
     </style>
 
@@ -18,6 +25,12 @@
     <script>
         var CrudTableRow = Polymer({
             is: "crud-table-row",
+
+            setActive: function(){
+                // TODO: set siblings inactive
+
+                Polymer.dom(this.$.row).classList.add('active');
+            },
 
             factoryImpl: function (full_obj_id, crud_table_component) {
                 var obj = storage.getObject(full_obj_id);
@@ -49,7 +62,7 @@
                     var new_cell_component = null;
                     switch (field_widget.name){
                         case 'text': {
-                            new_cell_component = new CrudTableCell_text(full_obj_id, field_name, field_widget.params, crud_table_component);
+                            new_cell_component = new CrudTableCell_text(full_obj_id, field_name, field_widget.params, crud_table_component, this);
                         }
                     }
 

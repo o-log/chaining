@@ -8,22 +8,11 @@
             display: block;
         }
 
-        :host.collapsed {
-            padding: 5px;
-            font-size: 10px;
-        }
-
         #list_container {
-            display: inline-block;
-            vertical-align: top;
-            width: 10%;
-            padding: 10px;
+            padding: 10px 10px 20px 10px;
         }
 
         #children_container {
-            display: inline-block;
-            vertical-align: top;
-            width: 85%;
         }
     </style>
 
@@ -36,30 +25,21 @@
 
     <script>
         var crudClassesList = {
-            updateChildren: function(list_element, list) {
-
-                var children_container = $(list_element).children('#children_container')[0];
-                children_container.innerHTML = '';
-                children_container.appendChild(list)
-
-            },
-
-            show: function () {
-                var classes_list_component = new crudClassesList.component();
-                document.querySelector('#page-content').appendChild(classes_list_component);
-
-                return false;
-            },
-
             component: Polymer({
                 is: "crud-classes-list",
 
                 ready: function () {
                     for (var class_name in crud.config) {
-                        var row_component = new CrudClassesListRow.component(class_name);
+                        var row_component = new CrudClassesListRow.component(class_name, this);
 
                         Polymer.dom(this).appendChild(row_component);
                     }
+                },
+
+                crud_replaceChildren: function(list) {
+                    var children_container = this.$.children_container;
+                    Polymer.dom(children_container).innerHTML = '';
+                    Polymer.dom(children_container).appendChild(list)
                 }
             })
         };

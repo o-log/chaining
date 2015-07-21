@@ -3,36 +3,33 @@
 <dom-module id="crud-editor">
 
     <style>
+
+        paper-material {
+            padding: 10px;
+        }
+
         :host {
-            display: block;
-            background-color: #eee;
-        }
-        #crud_obj_editor {
-            padding: 20px;
-        }
-        #title {
-            font-weight: bold;
         }
 
         iron-pages > div {
-            border-top: 2px solid #ccc;
+            /*border-top: 1px solid #ddd;*/
         }
+
     </style>
 
     <template>
-        <div id="crud_obj_editor">
-            <div id="title"></div>
+        <paper-material>
             <paper-tabs id="tabs" selected="0">
             </paper-tabs>
             <iron-pages id="pages" selected="0">
-                <div>
-                    <content></content>
+                <!--<div>
+                    </content>
                     <div style="text-align: right;">
                         <paper-button raised onclick="return crudEditor.saveEditor();">Сохранить</paper-button>
                     </div>
-                </div>
+                </div>-->
             </iron-pages>
-        </div>
+        </paper-material>
     </template>
 
     <script>
@@ -48,37 +45,45 @@
 
                     var obj = storage.getObject(obj_full_id);
 
-                    this.$.title.textContent = Model.getTitleForObj(obj);
+                    //this.$.title.textContent = Model.getTitleForObj(obj);
 
-                    var crud_config_for_class = crud.config[obj._class_name];
-                    for (var i = 0; i < crud_config_for_class.editor.length; i++) {
-                        var field_config = crud_config_for_class.editor[i];
-
-                        var field_component = null;
-                        switch(field_config.widget.name){
-                            case 'input':
-                                field_component = new CrudEditorFieldInput(obj_full_id, field_config.field_name, field_config.widget.params);
-                                break;
-                            case 'textarea':
-                                field_component = new CrudEditorFieldTextarea(obj_full_id, field_config.field_name, field_config.widget.params);
-                                break;
-                        }
-
-                        Polymer.dom(this).appendChild(field_component);
-                    }
-
-                    var tab_index = 0; // вся жесть вокруг tab_index изза почемуто невозможности выбрать список табов нормальным селектором и навесить онклики
-
+                    var page_index = 0; // вся жесть вокруг page_index изза почемуто невозможности выбрать список табов нормальным селектором и навесить онклики
                     var pages = this.$.pages;
 
-                    var tab = document.createElement("paper-tab");
-                    tab.textContent = 'данные';
-                    Polymer.dom(this.$.tabs).appendChild(tab);
-                    tab.dataset.page_index = tab_index;
-                    tab.onclick = function(){
-                        pages.selected = this.dataset.page_index;
-                    };
-                    tab_index++;
+                    var crud_config_for_class = crud.config[obj._class_name];
+                    for (var tab_index = 0; tab_index < crud_config_for_class.editor.length; tab_index++) {
+                        var tab_config = crud_config_for_class.editor[tab_index];
+
+                        var tab = document.createElement("paper-tab");
+                        tab.textContent = tab_config.tab_title;
+                        tab.dataset.page_index = page_index;
+                        tab.onclick = function(){
+                            pages.selected = this.dataset.page_index;
+                        };
+                        Polymer.dom(this.$.tabs).appendChild(tab);
+
+                        var page_element = document.createElement("div");
+                        Polymer.dom(this.$.pages).appendChild(page_element);
+
+                        for (var field_index = 0; field_index < tab_config.fields.length; field_index++) {
+                            var field_config = tab_config.fields[field_index];
+
+                            var field_component = null;
+                            switch (field_config.widget.name) {
+                                case 'input':
+                                    field_component = new CrudEditorFieldInput(obj_full_id, field_config.field_name, field_config.widget.params);
+                                    break;
+                                case 'textarea':
+                                    field_component = new CrudEditorFieldTextarea(obj_full_id, field_config.field_name, field_config.widget.params);
+                                    break;
+                            }
+
+                            Polymer.dom(page_element).appendChild(field_component);
+                        }
+
+                        page_index++;
+                    }
+
 
                     if (crud_config_for_class.linked_models){
                         for (var i in crud_config_for_class.linked_models){
@@ -97,7 +102,7 @@
                             Polymer.dom(this.$.pages).appendChild(div);
 
                             var tab = document.createElement("paper-tab");
-                            tab.dataset.page_index = tab_index;
+                            tab.dataset.page_index = page_index;
                             tab.onclick = function(){
                                 pages.selected = this.dataset.page_index;
                             };
@@ -106,9 +111,13 @@
                             tab.textContent = crud.getClassTitleByName(linked_class_name);
                             Polymer.dom(this.$.tabs).appendChild(tab);
 
-                            tab_index++;
+                            page_index++;
                         }
                     }
+
+                    // нужно, чтобы табы правильно отрисовались (какой-то баг?)
+                    this.$.pages.selected = 0;
+                    this.$.tabs.selected = 0;
                 }
             }),
 

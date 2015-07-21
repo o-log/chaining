@@ -60,6 +60,10 @@
     "dataSource": "db-stats",
     "public": true
   },
+  "keyvalue2_items": {
+    "dataSource": "db-news",
+    "public": true
+  },
   "adminlog": {
     "dataSource": "db-news",
     "public": true

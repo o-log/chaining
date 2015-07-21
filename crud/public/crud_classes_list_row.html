@@ -4,20 +4,21 @@
 
     <!-- scoped CSS for this element -->
     <style>
-        div {
-            padding: 4px;
+        :host {
+            padding: 20px 20px 20px 0;
         }
 
-        .selected {
-            #background-color: #000;
+        #edit_link {
+            color: #333;
+            text-decoration: none;
+            font-face: Roboto;
+            font-size: 16px;
         }
 
     </style>
 
     <template>
-        <div>
             <a id="edit_link" href="#"></a>
-        </div>
     </template>
 
     <script>
@@ -25,12 +26,25 @@
             component: Polymer({
                 is: "crud-classes-list-row",
 
-                factoryImpl: function (class_name) {
+                factoryImpl: function (class_name, list_component) {
                     var class_title = crud.getClassTitleByName(class_name);
 
                     this.$.edit_link.textContent = class_title;
                     this.$.edit_link.dataset.crud_class_name = class_name;
-                    this.$.edit_link.onclick = CrudClassesListRow.crudClassOnClick;
+                    //this.$.edit_link.onclick = CrudClassesListRow.crudClassOnClick;
+
+
+
+                    this.$.edit_link.onclick = function(){
+                        //var class_name = $(this).data('crud_class_name');
+
+                        var list = new CrudTable.component(class_name);
+                        //var list_element = $(this).parents('crud-classes-list')[0];
+
+                        list_component.crud_replaceChildren(list);
+
+                        return false;
+                    };
                 },
 
                 ready: function () {
@@ -38,9 +52,9 @@
                 }
             }),
 
+            /*
             crudClassOnClick: function () {
                 var class_name = $(this).data('crud_class_name');
-                this.classList.add('selected');
 
                 var list = new CrudTable.component(class_name);
                 var list_element = $(this).parents('crud-classes-list')[0];
@@ -49,6 +63,7 @@
 
                 return false;
             }
+            */
         };
     </script>
 

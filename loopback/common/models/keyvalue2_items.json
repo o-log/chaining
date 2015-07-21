@@ -1,0 +1,42 @@
+{
+  "name": "keyvalue2_items",
+  "plural": "keyvalue2_items",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true,
+    "mysql": {
+      "table": "keyvalue2_items"
+    }
+  },
+  "properties": {
+    "name": {
+      "type": "string",
+      "required": false
+    },
+    "value": {
+      "type": "string",
+      "required": false
+    },
+    "parent_id": {
+      "type": "string",
+      "required": false
+    },
+    "fullname": {
+      "type": "string",
+      "required": false
+    },
+    "description": {
+      "type": "string",
+      "required": false
+    },
+    "weight": {
+      "type": "string",
+      "required": false
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}

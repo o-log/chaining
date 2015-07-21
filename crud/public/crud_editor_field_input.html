@@ -3,11 +3,16 @@
 <dom-module id="crud-editor-field-input">
 
     <style>
+        :host {
+            /*display: block;
+            margin-top: 15px; margin-bottom: 15px;*/ /* fix displaying bug */
+        }
+
     </style>
 
     <template>
         <div>
-            <paper-input id="input"></paper-input>
+            <paper-input id="input" label="label"></paper-input>
         </div>
     </template>
 

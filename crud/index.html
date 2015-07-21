@@ -3,6 +3,14 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
+        html {
+            overflow-y:scroll;
+        }
+
+        body {
+            background-color: #f9f9f9;
+        }
+
         #page-content{
             padding: 30px;
         }
@@ -21,8 +29,8 @@
 
 <script>
     // Document-level global Polymer settings can be set by creating a Polymer object on window before importing the Polymer library
-    //window.Polymer = window.Polymer || {};
-    //window.Polymer.dom = 'shadow'; // oLog: "shady" implementation (default) is waaay faster (2x)
+    window.Polymer = window.Polymer || {};
+    window.Polymer.dom = 'shadow'; // oLog: "shady" implementation (default) is waaay faster (2x)
 </script>
 
 <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
@@ -42,9 +50,13 @@
 <link rel="import" href="bower_components/paper-styles/paper-styles.html">
 <link rel="import" href="bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="bower_components/paper-material/paper-material.html">
+<link rel="import" href="bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="public/crud_table_row.html">
 <link rel="import" href="public/crud_table.html">
 <link rel="import" href="public/crud_table_filter.html">
+<link rel="import" href="public/crud_table_order.html">
 <link rel="import" href="public/crud_classes_list.html">
 <link rel="import" href="public/crud_classes_list_row.html">
 <link rel="import" href="public/crud_editor.html">
@@ -78,7 +90,9 @@
 
 <script>
 
-    crudClassesList.show();
+    var classes_list_component = new crudClassesList.component();
+    document.querySelector('#page-content').appendChild(classes_list_component);
+    //crudClassesList.show();
 
 </script>
 

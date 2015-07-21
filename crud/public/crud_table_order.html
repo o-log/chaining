@@ -1,6 +1,6 @@
 <link rel="import" href="/bower_components/polymer/polymer.html">
 
-<dom-module id="crud-table-filter">
+<dom-module id="crud-table-order">
 
     <!-- scoped CSS for this element -->
     <style>
@@ -8,15 +8,17 @@
 
     <template>
         <div>
-            <paper-input id="input"></paper-input>
+            <span id="field_name"></span> <paper-checkbox id="input"></paper-checkbox>
+            <!--<paper-toggle-button id="direction"></paper-toggle-button>-->
+            <!--<paper-input id="input"></paper-input>-->
         </div>
     </template>
 
     <script>
-        var CrudTableFilter = {
+        var CrudTableOrder = {
 
             component: Polymer({
-                is: "crud-table-filter",
+                is: "crud-table-order",
 
                 properties: {
                     crud_class_name: String,
@@ -25,19 +27,21 @@
                 },
 
                 factoryImpl: function (table_component, class_name, search_field_name, value) {
+                    /* TODO: rewrite
+                    //this.$.input.textContent = search_field_name;
+                    this.$.field_name.textContent = 'order by ' + search_field_name;
+
                     this.crud_field_name = search_field_name;
                     this.crud_field_value = value;
 
-                    this.$.input.label = 'filter by ' + search_field_name;
-                    this.$.input.value = value;
-
                     var filter_polymer = this;
 
-                    this.$.input.addEventListener('keyup', function () {
+                    this.$.input.addEventListener('iron-change', function () {
                         filter_polymer.crud_field_value = this.value;
 
                         table_component.apiQuery(class_name, 0);
                     });
+                    */
                 }
             })
         };
