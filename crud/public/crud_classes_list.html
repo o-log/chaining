@@ -5,21 +5,30 @@
     <!-- scoped CSS for this element -->
     <style>
         :host {
-            display: block;
+            /*display: block;*/
         }
 
         #list_container {
-            padding: 10px 10px 20px 10px;
+            padding: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #contexts_container {
+            border-bottom: 1px solid #ddd;
         }
 
         #children_container {
         }
+
     </style>
 
     <template>
-        <div id="list_container">
-            <content></content>
+        <div>
+            <div id="list_container">
+                <content></content>
+                </div>
         </div>
+        <div id="contexts_container"></div>
         <div id="children_container"></div>
     </template>
 
@@ -34,6 +43,14 @@
 
                         Polymer.dom(this).appendChild(row_component);
                     }
+                },
+
+                crud_addContext: function(context) {
+                    var contexts_container = this.$.contexts_container;
+                    //Polymer.dom(contexts_container).innerHTML = '';
+                    var elem = document.createElement('div');
+                    elem.textContent = context;
+                    Polymer.dom(contexts_container).appendChild(elem);
                 },
 
                 crud_replaceChildren: function(list) {

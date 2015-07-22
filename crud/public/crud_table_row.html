@@ -4,22 +4,27 @@
 
     <!-- scoped CSS for this element -->
     <style>
+        /*
         :host {
             display: block;
             padding: 5px 0 5px 0;
         }
+        */
 
         #row.active {
             background-color: #eee;
-            margin: 0px -10px 0px -10px;
+            /*margin: 0px -10px 0px -10px;
             padding-left: 10px;
-            padding-right: 10px;
+            padding-right: 10px;*/
         }
     </style>
 
     <template>
-        <div id="row">
-        </div>
+        <paper-item id="row">
+            <paper-item-body two-line>
+                <content></content>
+            </paper-item-body>
+        </paper-item>
     </template>
 
     <script>
@@ -66,7 +71,8 @@
                         }
                     }
 
-                    Polymer.dom(this.$.row).appendChild(new_cell_component);
+                    //Polymer.dom(this.$.row).appendChild(new_cell_component);
+                    Polymer.dom(this).appendChild(new_cell_component);
                 }
             },
 

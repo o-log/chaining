@@ -2,6 +2,50 @@ var crud = {
         //lists: {},
 
         config: {
+            node: {
+                title: 'материалы',
+                id_field_name: 'nid',
+                title_field_name: 'title',
+                table: {
+                    search_fields: [
+                        {
+                            field_name: 'nid'
+                        }
+                    ],
+                    order_fields: [
+                        {
+                            field_name: 'nid'
+                        }
+                    ],
+                    columns: [
+                        {
+                            field_name: 'title', widget: {name: 'text', params: {edit_link: true}}
+                        },
+                        {
+                            field_name: 'created', widget: {name: 'text', params: {edit_link: false}}
+                        }
+                    ]
+                },
+                editor: [
+                    {
+                        tab_title: 'поля',
+                        fields: [
+                            {field_name: 'nid', widget: {name: 'input'}},
+                            {field_name: 'title', widget: {name: 'textarea'}},
+                            {field_name: 'type', widget: {name: 'input'}},
+                            {field_name: 'url_alias', widget: {name: 'textarea'}}
+                        ]
+                    },
+                    {
+                        tab_title: 'контент',
+                        fields: []
+                    }
+                ],
+                linked_models: [
+                    {class_name: 'poll', reference_field: 'node_id'},
+                    {class_name: 'game_media', reference_field: 'nid'}
+                ]
+            },
             keyvalue2_items: {
                 title: 'keyvalue2',
                 title_field_name: 'name',
@@ -94,48 +138,6 @@ var crud = {
                 ],
                 linked_models: [
                     {class_name: 'poll_answer', reference_field: 'poll_id'}
-                ]
-            },
-            node: {
-                title: 'материалы',
-                id_field_name: 'nid',
-                title_field_name: 'title',
-                table: {
-                    search_fields: [
-                        {
-                            field_name: 'nid'
-                        }
-                    ],
-                    order_fields: [
-                        {
-                            field_name: 'nid'
-                        }
-                    ],
-                    columns: [
-                        {
-                            field_name: 'title',
-                            widget: {name: 'text', params: {edit_link: true}}
-                        }
-                    ]
-                },
-                editor: [
-                    {
-                        tab_title: 'поля',
-                        fields: [
-                            {field_name: 'nid', widget: {name: 'input'}},
-                            {field_name: 'title', widget: {name: 'textarea'}},
-                            {field_name: 'type', widget: {name: 'input'}},
-                            {field_name: 'url_alias', widget: {name: 'textarea'}}
-                        ]
-                    },
-                    {
-                        tab_title: 'контент',
-                        fields: []
-                    }
-                ],
-                linked_models: [
-                    {class_name: 'poll', reference_field: 'node_id'},
-                    {class_name: 'game_media', reference_field: 'nid'}
                 ]
             },
             poll_answer: {

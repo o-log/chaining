@@ -31,17 +31,17 @@
 
                     this.$.edit_link.textContent = class_title;
                     this.$.edit_link.dataset.crud_class_name = class_name;
-                    //this.$.edit_link.onclick = CrudClassesListRow.crudClassOnClick;
-
-
 
                     this.$.edit_link.onclick = function(){
                         //var class_name = $(this).data('crud_class_name');
 
-                        var list = new CrudTable.component(class_name);
+                        var table_polymer = new CrudTable.component(class_name);
                         //var list_element = $(this).parents('crud-classes-list')[0];
 
-                        list_component.crud_replaceChildren(list);
+                        list_component.crud_replaceChildren(table_polymer);
+
+                        list_component.crud_addContext('list: ' + class_name);
+                        window.location.hash = table_polymer.crud_getContextHash();
 
                         return false;
                     };
@@ -50,20 +50,7 @@
                 ready: function () {
                     console.log('ready');
                 }
-            }),
-
-            /*
-            crudClassOnClick: function () {
-                var class_name = $(this).data('crud_class_name');
-
-                var list = new CrudTable.component(class_name);
-                var list_element = $(this).parents('crud-classes-list')[0];
-
-                crudClassesList.updateChildren(list_element, list);
-
-                return false;
-            }
-            */
+            })
         };
     </script>
 

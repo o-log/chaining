@@ -17,25 +17,29 @@
         #table_container {
             display: table-cell;
             vertical-align: top;
-            padding: 10px;
-            width: 90%;
+            /*padding: 10px;*/
+            width: 100%;
+            background-color: white;
         }
 
         #table_container.narrow {
             width: 15%;
-            background-color: #f9f9f9;
+            /*background-color: #f9f9f9;*/
         }
 
         #children_container {
-            display: table-cell;
             vertical-align: top;
+            padding: 20px;
+            display: none;
         }
 
         #children_container.wide {
+            background-color: #f9f9f9;
+            display: table-cell;
         }
 
         #controls {
-            padding: 10px 0 10px 0;
+            padding: 10px;
             /*background-color: #eee;*/
             display: none;
         }
@@ -46,25 +50,27 @@
 
         #toggle_filters {
             cursor: pointer;
-            font-size: 10px;
+            /*font-size: 10px;*/
         }
     </style>
 
     <template>
         <div style="display: table-row;">
             <div id="table_container">
-                <div>
-                    <!--<span id="title">TITLE</span>-->
-                    <span id="toggle_filters"
-                          on-click="crud_toggleFilters">&#x2630;</span>
-                </div>
+                <paper-material elevation="1">
+                    <div style="padding: 10px 10px 0 10px;">
+                        <!--<span id="title">TITLE</span>-->
+                        <span id="toggle_filters"
+                              on-click="crud_toggleFilters">&#x2630;</span>
+                    </div>
 
-                <div id="controls">
-                    <div id="filters"></div>
-                    <div id="orders"></div>
-                </div>
-                <div id="list_container">
-                </div>
+                    <div id="controls">
+                        <div id="filters"></div>
+                        <div id="orders"></div>
+                    </div>
+                    <div id="list_container">
+                    </div>
+                </paper-material>
             </div>
             <div id="children_container">
             </div>
@@ -76,11 +82,13 @@
             component: Polymer({
                 is: "crud-table",
 
-                crud_toggleFilters: function() {
+                crud_toggleFilters: function () {
                     Polymer.dom(this.$.controls).classList.toggle('visible');
                 },
 
                 factoryImpl: function (class_name, filters_arr, orders_arr) {
+                    this.crud_class_name = class_name;
+
                     this.$.filters.dataset.class_name = class_name;
                     //this.$.title.textContent = crud.getClassTitleByName(class_name);
 
@@ -122,7 +130,7 @@
 
                     var api_url = 'localhost:3001';
                     if (!limit) {
-                        limit = 300;
+                        limit = 100;
                     }
 
                     var query_url = 'http://' + api_url + '/api/' + class_name;
@@ -142,7 +150,18 @@
                     });
                 },
 
+                crud_getContextHash: function(){
+                    var hash = {
+                        type: 'crud-table',
+                        class_name: this.crud_class_name
+                    };
 
+                    if (this.crud_active_editor){
+                        hash.editor = this.crud_active_editor.crud_getContextHash();
+                    }
+
+                    return hash;
+                }
             }),
 
 
