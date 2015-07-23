@@ -150,6 +150,23 @@
                     });
                 },
 
+                crud_setActiveEditor: function(editor_polymer){
+
+                    var append_context = true;
+                    if (this.crud_active_editor){
+                        append_context = false;
+                    }
+
+                    this.crud_active_editor = editor_polymer;
+                    this.crud_replaceChildren(editor_polymer);
+
+                    var classes_list_polymer =  document.getElementsByTagName('crud-classes-list')[0];
+                    console.assert(classes_list_polymer);
+
+                    classes_list_polymer.crud_replaceChildren(this);
+                    classes_list_polymer.crud_updateContext(this, append_context);
+                },
+
                 crud_getContextHash: function(){
                     var hash = {
                         type: 'crud-table',
@@ -163,7 +180,6 @@
                     return hash;
                 }
             }),
-
 
             appendOrderFIlters: function (table_component, query_url) {
                 var filters = $(table_component.$.orders).find('paper-checkbox');

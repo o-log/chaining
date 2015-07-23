@@ -22,7 +22,7 @@ var crud = {
                             field_name: 'title', widget: {name: 'text', params: {edit_link: true}}
                         },
                         {
-                            field_name: 'created', widget: {name: 'text', params: {edit_link: false}}
+                            field_name: 'created', widget: {name: 'timestamp', params: {edit_link: false}}
                         }
                     ]
                 },

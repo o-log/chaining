@@ -56,20 +56,14 @@
                             table_row_polymer.setActive();
 
                             var editor_component = new crudEditor.component(obj_full_id);
-                            table_polymer.crud_replaceChildren(editor_component);
-
-                            var classes_list_polymer =  document.getElementsByTagName('crud-classes-list')[0];
-                            console.assert(classes_list_polymer);
+                            table_polymer.crud_setActiveEditor(editor_component);
 
                             /*
                             Polymer.dom(classes_list_polymer.$.children_container).innerHTML = '';
                             Polymer.dom(classes_list_polymer.$.children_container).appendChild(crud_table_component);
                             */
 
-                            classes_list_polymer.crud_addContext('editor: ' + obj_full_id);
-                            classes_list_polymer.crud_replaceChildren(table_polymer);
-
-                            table_polymer.crud_active_editor = 
+                            //classes_list_polymer.crud_addContext('editor: ' + obj_full_id);
 
                             return false;
                         };

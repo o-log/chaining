@@ -66,12 +66,15 @@
 
                     var new_cell_component = null;
                     switch (field_widget.name){
-                        case 'text': {
+                        case 'text':
                             new_cell_component = new CrudTableCell_text(full_obj_id, field_name, field_widget.params, crud_table_component, this);
-                        }
+                            break;
+
+                        case 'timestamp':
+                            new_cell_component = new CrudTableCell_timestamp(full_obj_id, field_name, field_widget.params, crud_table_component, this);
+                            break;
                     }
 
-                    //Polymer.dom(this.$.row).appendChild(new_cell_component);
                     Polymer.dom(this).appendChild(new_cell_component);
                 }
             },

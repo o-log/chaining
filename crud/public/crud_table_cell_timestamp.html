@@ -1,0 +1,47 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<dom-module id="crud-table-cell-timestamp">
+
+    <style>
+        /*
+        #cell {
+            display: inline-block;
+            font-family: Roboto;
+            font-size: 16px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #009688;
+        }
+        */
+
+    </style>
+
+    <template>
+        <div id="cell">
+        </div>
+    </template>
+
+    <script>
+        var CrudTableCell_timestamp = Polymer({
+            is: "crud-table-cell-timestamp",
+
+            factoryImpl: function (full_obj_id, field_name, widget_params, table_polymer, table_row_polymer) {
+                var obj = storage.getObject(full_obj_id);
+
+                var field_value = obj[field_name];
+
+                var a = new Date(field_value * 1000);
+
+
+                this.$.cell.textContent = a.toString();
+            },
+
+            ready: function () {
+                //console.log('ready');
+            }
+        });
+    </script>
+
+</dom-module>

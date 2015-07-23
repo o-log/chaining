@@ -45,6 +45,27 @@
                     }
                 },
 
+                crud_updateContext: function(crud_table_polymer, append) {
+                    var contexts_container = this.$.contexts_container;
+
+                    var hash = crud_table_polymer.crud_getContextHash();
+                    var hash_str = JSON.stringify(hash);
+
+                    var elem = document.createElement('div');
+                    elem.textContent = hash_str;
+
+                    if (!append) {
+                        var lc = Polymer.dom(contexts_container).lastChild;
+                        if (lc) {
+                            Polymer.dom(contexts_container).removeChild(lc);
+                        }
+                    }
+                    Polymer.dom(contexts_container).appendChild(elem);
+
+                    window.location.hash = hash_str;
+                },
+
+                /*
                 crud_addContext: function(context) {
                     var contexts_container = this.$.contexts_container;
                     //Polymer.dom(contexts_container).innerHTML = '';
@@ -52,6 +73,7 @@
                     elem.textContent = context;
                     Polymer.dom(contexts_container).appendChild(elem);
                 },
+                */
 
                 crud_replaceChildren: function(list) {
                     var children_container = this.$.children_container;

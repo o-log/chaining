@@ -35,13 +35,22 @@
     <script>
 
         var crudEditor = {
-            obj_full_id: '', // TODO: avoid global variable, store obj id to editor component
-
             component: Polymer({
                 is: "crud-editor",
 
+                obj_full_id: '',
+
+                crud_getContextHash: function(){
+                    var hash = {};
+
+                    hash.obj_full_id = this.obj_full_id;
+                    hash.tab = 0;
+
+                    return hash;
+                },
+
                 factoryImpl: function (obj_full_id) {
-                    crudEditor.obj_full_id = obj_full_id;
+                    this.obj_full_id = obj_full_id;
 
                     var obj = storage.getObject(obj_full_id);
 
