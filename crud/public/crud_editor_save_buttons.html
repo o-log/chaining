@@ -1,0 +1,29 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<dom-module id="crud-editor-save-buttons">
+
+    <style>
+        :host {
+        }
+
+    </style>
+
+    <template>
+        <div style="text-align: right;">
+            <paper-button raised onclick="return crudEditor.saveEditor();">Сохранить</paper-button>
+        </div>
+    </template>
+
+    <script>
+        CrudEditorSaveButtons = Polymer({
+            is: "crud-editor-save-buttons",
+
+            factoryImpl: function() {
+            },
+
+            ready: function(){
+            }
+        });
+    </script>
+
+</dom-module>

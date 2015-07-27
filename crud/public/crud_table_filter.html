@@ -35,8 +35,7 @@
 
                     this.$.input.addEventListener('keyup', function () {
                         filter_polymer.crud_field_value = this.value;
-
-                        table_component.apiQuery(class_name, 0);
+                        table_component.onFilterUpdate();
                     });
                 }
             })

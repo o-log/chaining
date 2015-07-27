@@ -11,11 +11,12 @@
             background-color: #f9f9f9;
         }
 
-        /*
         #page-content{
-            padding: 30px;
+            /*padding: 30px;*/
+            height: 100%;
         }
 
+        /*
         a {
             text-decoration: none;
         }
@@ -68,6 +69,7 @@
 <link rel="import" href="public/crud_table_cell_timestamp.html">
 <link rel="import" href="public/crud_editor_field_input.html">
 <link rel="import" href="public/crud_editor_field_textarea.html">
+<link rel="import" href="public/crud_editor_save_buttons.html">
 
 <!--<div id="page-content"></div>-->
 
@@ -85,9 +87,7 @@
         </nav>
     </div>
     <main class="mdl-layout__content">
-        <div class="page-content">
-            <div id="page-content">
-            </div>
+        <div id="page-content">
         </div>
     </main>
 </div>
@@ -97,7 +97,11 @@
 
     var classes_list_component = new crudClassesList.component();
     document.querySelector('#page-content').appendChild(classes_list_component);
-    //crudClassesList.show();
+
+    var hash = window.location.hash;
+    if (hash){
+        //classes_list_component.crud_updateFromHash(); // сейчас не заработает, потому что перед показом редактора для объекта модель должна быть загружена в хранилище. т.е. активировать редактор можно только после ответа от апи на запрос таблицы с фильтрами
+    }
 
 </script>
 

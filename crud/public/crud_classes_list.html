@@ -6,6 +6,7 @@
     <style>
         :host {
             /*display: block;*/
+            height: 100%;
         }
 
         #list_container {
@@ -14,7 +15,14 @@
         }
 
         #contexts_container {
+            padding: 20px 20px 20px 20px;
             border-bottom: 1px solid #ddd;
+            font-family: Roboto;
+            font-size: 16px;
+        }
+
+        #contexts_container :last-child {
+            color: #ccc;
         }
 
         #children_container {
@@ -45,7 +53,7 @@
                     }
                 },
 
-                updateFromHash: function() {
+                crud_updateFromHash: function() {
                     var hash = window.location.hash;
 
                     // remove leading hash
@@ -58,7 +66,7 @@
                     //this.$.contexts_container.innerHTML = '';
                     //this.children_container.innerHTML = '';
 
-                    var table_polymer = new CrudTable.component(hash_obj.class_name);
+                    var table_polymer = new CrudTable.component(hash_obj.class_name, hash_obj.filters);
                     if (hash_obj.editor) {
                         var obj_full_id = hash_obj.editor.obj_full_id;
                         var editor_component = new crudEditor.component(obj_full_id, table_polymer);
@@ -67,6 +75,11 @@
 
                     this.crud_replaceChildren(table_polymer);
 
+                },
+
+                crud_clearContexts: function(){
+                    var contexts_container = this.$.contexts_container;
+                    contexts_container.innerHTML = '';
                 },
 
                 crud_updateContext: function(crud_table_polymer, append) {
@@ -82,9 +95,22 @@
                     var classes_list_polymer = this;
 
                     elem.onclick = function(){
-                        //alert(hash_str);
+                        // стираем из истории контекстов выбранный контекст и все последующие
+                        // потом, при переходе на выбранный контекст он снова допишется в конец истории и станет текущим
+                        var nodes = Polymer.dom(classes_list_polymer.$.contexts_container).childNodes;
+                        if (nodes.length){
+                            var after_this = false;
+                            for (var i = 0; i < nodes.length; i++){
+                                var node = nodes[i];
+                                if ((node == this) || after_this){
+                                    Polymer.dom(classes_list_polymer.$.contexts_container).removeChild(node);
+                                    after_this = true;
+                                }
+                            }
+                        }
+
                         window.location.hash = hash_str;
-                        classes_list_polymer.updateFromHash();
+                        classes_list_polymer.crud_updateFromHash();
                     };
 
                     if (!append) {
@@ -97,16 +123,6 @@
 
                     window.location.hash = hash_str;
                 },
-
-                /*
-                crud_addContext: function(context) {
-                    var contexts_container = this.$.contexts_container;
-                    //Polymer.dom(contexts_container).innerHTML = '';
-                    var elem = document.createElement('div');
-                    elem.textContent = context;
-                    Polymer.dom(contexts_container).appendChild(elem);
-                },
-                */
 
                 crud_replaceChildren: function(list) {
                     var children_container = this.$.children_container;

@@ -377,6 +377,6 @@ var crud = {
             }
 
             return class_title;
-        },
+        }
 
 };

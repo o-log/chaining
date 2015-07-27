@@ -38,9 +38,12 @@
             display: table-cell;
         }
 
+        #header {
+            border-bottom: 1px solid #ccc;
+        }
+
         #controls {
-            padding: 20px;
-            /*background-color: #eee;*/
+            padding: 0 20px 20px 20px;
             display: none;
         }
 
@@ -52,21 +55,28 @@
             cursor: pointer;
             /*font-size: 10px;*/
         }
+
+        #toggle_filters_container {
+        }
     </style>
 
     <template>
         <div style="display: table-row;">
             <div id="table_container">
-                <paper-material elevation="1">
-                    <div style="padding: 20px 10px 0 20px;">
+                <paper-material elevation="1" style="min-height: 1500px;">
+                    <div id="header">
+                    <div id="toggle_filters_container" style="display: table; width: 100%;">
+                        <div style="display: table-row;">
                         <!--<span id="title">TITLE</span>-->
-                        <span id="toggle_filters"
-                              on-click="crud_toggleFilters">&#x2630;</span>
+                            <div style="display: table-cell; padding: 20px; color: #2196F3; font-family: Roboto;" id="add_remove">ADD <span style="color: #ccc;">REMOVE</span></div>
+                            <div style="display: table-cell; padding: 20px; text-align: right;" id="toggle_filters" on-click="crud_toggleFilters">&#x2630;</div>
+                        </div>
                     </div>
 
                     <div id="controls">
                         <div id="filters"></div>
                         <div id="orders"></div>
+                    </div>
                     </div>
                     <div id="list_container">
                     </div>
@@ -84,6 +94,12 @@
 
                 crud_toggleFilters: function () {
                     Polymer.dom(this.$.controls).classList.toggle('visible');
+                },
+
+                onFilterUpdate: function() {
+                    var classes_list_polymer =  document.getElementsByTagName('crud-classes-list')[0];
+                    classes_list_polymer.crud_updateContext(this, false);
+                    this.apiQuery();
                 },
 
                 setAllRowsInactive: function() {
@@ -105,7 +121,7 @@
                     CrudTable.renderFilters(class_name, this, filters_arr);
                     CrudTable.renderOrders(class_name, this, orders_arr);
 
-                    this.apiQuery(class_name);
+                    this.apiQuery();
                 },
 
                 crud_replaceChildren: function (editor_component) {
@@ -119,7 +135,13 @@
                     table_container.classList.add('narrow');
                 },
 
-                appendWhereFilters: function (query_url) {
+                // возвращает массов фильтров таблицы
+                // в массив попадают только те фильтры, в которые чтото введено
+                // т.е. этот массив должен использоваться для передачи в апи или для сохранения в контексте
+                // элементами массива являются ассоциативные массивы с полями field_name и value
+                getFiltersValues: function(){
+                    var filters_arr = [];
+
                     var filters = this.$.filters.querySelectorAll('crud-table-filter');
                     if (filters.length) {
                         for (var i = 0; i < filters.length; i++) {
@@ -127,15 +149,29 @@
                             var filter_field_name = filter_element.crud_field_name;
                             var filter_value = filter_element.crud_field_value;
                             if (filter_value) {
-                                query_url += '&filter[where][' + filter_field_name + ']=' + filter_value;
+                                filters_arr.push({'field_name': filter_field_name, 'value': filter_value});
                             }
                         }
+                    }
+
+                    return filters_arr;
+                },
+
+                appendWhereFilters: function (query_url) {
+                    var filters = this.getFiltersValues();
+
+                    for (var i in filters){
+                        var filter = filters[i];
+                        query_url += '&filter[where][' + filter.field_name + ']=' + filter.value;
                     }
 
                     return query_url;
                 },
 
-                apiQuery: function (class_name, limit) {
+                apiQuery: function () {
+                    var class_name = this.crud_class_name;
+                    var limit = 0;
+
                     Polymer.dom(this.$.list_container).innerHTML = '';
 
                     var api_url = 'localhost:3001';
@@ -184,6 +220,8 @@
                         class_name: this.crud_class_name
                     };
 
+                    hash.filters = this.getFiltersValues();
+
                     if (this.crud_active_editor){
                         hash.editor = this.crud_active_editor.crud_getContextHash();
                     }
@@ -193,10 +231,14 @@
 
                 crud_getContextStr: function(){
                     var str = '';
-                    str += this.crud_class_name;
+                    str += crud.getClassTitleByName(this.crud_class_name);
 
                     if (this.crud_active_editor){
-                        str += ' ' + this.crud_active_editor.crud_getContextStr();
+                        //str += ' ' + this.crud_active_editor.crud_getContextStr();
+                        var active_editor_obj_full_id = this.crud_active_editor.obj_full_id;
+                        var obj = storage.getObject(active_editor_obj_full_id);
+                        var obj_name = Model.getTitleForObj(obj);
+                        str += ': ' + obj_name;
                     }
 
                     return str;
@@ -266,8 +308,17 @@
 
                         // потом берем переопределенное значение фильтра (если таблица создается программно и фильтр определяется контекстом)
                         if (filters_arr) {
+                            /*
                             if (filters_arr[search_field_name]) {
                                 search_field_value = filters_arr[search_field_name];
+                            }
+                            */
+
+                            for (var filter_index in filters_arr){
+                                var filter = filters_arr[filter_index];
+                                if (filter.field_name == search_field_name){
+                                    search_field_value = filter.value;
+                                }
                             }
                         }
 

@@ -101,6 +101,9 @@
                             Polymer.dom(page_element).appendChild(field_component);
                         }
 
+                        var buttons_polymer = document.createElement('crud-editor-save-buttons');
+                        Polymer.dom(page_element).appendChild(buttons_polymer);
+
                         page_index++;
                     }
 
@@ -110,8 +113,8 @@
                             var linked_model_config = crud_config_for_class.linked_models[i];
                             var linked_class_name = linked_model_config.class_name;
                             var link_field = linked_model_config.reference_field;
-                            var filters_arr = {};
-                            filters_arr[link_field] = Model.getIdForObj(obj);
+                            var filters_arr = [];
+                            filters_arr.push({'field_name': link_field, 'value': Model.getIdForObj(obj)});
 
                             var list = new CrudTable.component(linked_class_name, filters_arr);
                             //crud.lists[class_name] = list;
