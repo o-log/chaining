@@ -45,14 +45,47 @@
                     }
                 },
 
+                updateFromHash: function() {
+                    var hash = window.location.hash;
+
+                    // remove leading hash
+                    if (hash.substring(0, 1) == '#'){
+                        hash = hash.substring(1);
+                    }
+
+                    var hash_obj = JSON.parse(hash);
+
+                    //this.$.contexts_container.innerHTML = '';
+                    //this.children_container.innerHTML = '';
+
+                    var table_polymer = new CrudTable.component(hash_obj.class_name);
+                    if (hash_obj.editor) {
+                        var obj_full_id = hash_obj.editor.obj_full_id;
+                        var editor_component = new crudEditor.component(obj_full_id, table_polymer);
+                        table_polymer.crud_setActiveEditor(editor_component);
+                    }
+
+                    this.crud_replaceChildren(table_polymer);
+
+                },
+
                 crud_updateContext: function(crud_table_polymer, append) {
                     var contexts_container = this.$.contexts_container;
 
                     var hash = crud_table_polymer.crud_getContextHash();
+                    var str = crud_table_polymer.crud_getContextStr();
                     var hash_str = JSON.stringify(hash);
 
                     var elem = document.createElement('div');
-                    elem.textContent = hash_str;
+                    elem.textContent = str;
+
+                    var classes_list_polymer = this;
+
+                    elem.onclick = function(){
+                        //alert(hash_str);
+                        window.location.hash = hash_str;
+                        classes_list_polymer.updateFromHash();
+                    };
 
                     if (!append) {
                         var lc = Polymer.dom(contexts_container).lastChild;

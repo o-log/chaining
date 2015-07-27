@@ -53,9 +53,9 @@
                             $(rows).removeClass('active');
                             */
 
-                            table_row_polymer.setActive();
+                            table_row_polymer.setActive(table_polymer);
 
-                            var editor_component = new crudEditor.component(obj_full_id);
+                            var editor_component = new crudEditor.component(obj_full_id, table_polymer);
                             table_polymer.crud_setActiveEditor(editor_component);
 
                             /*

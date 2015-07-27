@@ -44,12 +44,20 @@
                     var hash = {};
 
                     hash.obj_full_id = this.obj_full_id;
-                    hash.tab = 0;
+                    hash.tab = this.$.pages.selected;
 
                     return hash;
                 },
 
-                factoryImpl: function (obj_full_id) {
+                crud_getContextStr: function(){
+                    var str = '';
+
+                    str += this.obj_full_id;
+
+                    return str;
+                },
+
+                factoryImpl: function (obj_full_id, table_polymer) {
                     this.obj_full_id = obj_full_id;
 
                     var obj = storage.getObject(obj_full_id);
@@ -68,6 +76,9 @@
                         tab.dataset.page_index = page_index;
                         tab.onclick = function(){
                             pages.selected = this.dataset.page_index;
+                            var classes_list_polymer =  document.getElementsByTagName('crud-classes-list')[0];
+                            console.assert(classes_list_polymer);
+                            classes_list_polymer.crud_updateContext(table_polymer, false);
                         };
                         Polymer.dom(this.$.tabs).appendChild(tab);
 
@@ -114,6 +125,9 @@
                             tab.dataset.page_index = page_index;
                             tab.onclick = function(){
                                 pages.selected = this.dataset.page_index;
+                                var classes_list_polymer =  document.getElementsByTagName('crud-classes-list')[0];
+                                console.assert(classes_list_polymer);
+                                classes_list_polymer.crud_updateContext(table_polymer, false);
                             };
 
 

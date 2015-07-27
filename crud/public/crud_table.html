@@ -23,7 +23,7 @@
         }
 
         #table_container.narrow {
-            width: 15%;
+            width: 30%;
             /*background-color: #f9f9f9;*/
         }
 
@@ -39,7 +39,7 @@
         }
 
         #controls {
-            padding: 10px;
+            padding: 20px;
             /*background-color: #eee;*/
             display: none;
         }
@@ -58,7 +58,7 @@
         <div style="display: table-row;">
             <div id="table_container">
                 <paper-material elevation="1">
-                    <div style="padding: 10px 10px 0 10px;">
+                    <div style="padding: 20px 10px 0 20px;">
                         <!--<span id="title">TITLE</span>-->
                         <span id="toggle_filters"
                               on-click="crud_toggleFilters">&#x2630;</span>
@@ -84,6 +84,16 @@
 
                 crud_toggleFilters: function () {
                     Polymer.dom(this.$.controls).classList.toggle('visible');
+                },
+
+                setAllRowsInactive: function() {
+                    var rows = this.$.list_container.querySelectorAll('crud-table-row');
+                    if (rows.length) {
+                        for (var i = 0; i < rows.length; i++) {
+                            var row_polymer = rows[i];
+                            row_polymer.setInactive();
+                        }
+                    }
                 },
 
                 factoryImpl: function (class_name, filters_arr, orders_arr) {
@@ -129,6 +139,8 @@
                     Polymer.dom(this.$.list_container).innerHTML = '';
 
                     var api_url = 'localhost:3001';
+                    //var api_url = 'localhost:8080';
+
                     if (!limit) {
                         limit = 100;
                     }
@@ -151,7 +163,6 @@
                 },
 
                 crud_setActiveEditor: function(editor_polymer){
-
                     var append_context = true;
                     if (this.crud_active_editor){
                         append_context = false;
@@ -178,6 +189,17 @@
                     }
 
                     return hash;
+                },
+
+                crud_getContextStr: function(){
+                    var str = '';
+                    str += this.crud_class_name;
+
+                    if (this.crud_active_editor){
+                        str += ' ' + this.crud_active_editor.crud_getContextStr();
+                    }
+
+                    return str;
                 }
             }),
 

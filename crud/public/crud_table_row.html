@@ -11,28 +11,34 @@
         }
         */
 
+        #row {
+            padding: 10px 20px 10px 20px;
+            font-size: 16px;
+            font-family: Roboto;
+        }
+
         #row.active {
             background-color: #eee;
-            /*margin: 0px -10px 0px -10px;
-            padding-left: 10px;
-            padding-right: 10px;*/
         }
     </style>
 
     <template>
-        <paper-item id="row">
-            <paper-item-body two-line>
-                <content></content>
-            </paper-item-body>
-        </paper-item>
+        <div id="row">
+             <content></content>
+        </div>
     </template>
 
     <script>
         var CrudTableRow = Polymer({
             is: "crud-table-row",
 
-            setActive: function(){
+            setInactive: function(){
+                Polymer.dom(this.$.row).classList.remove('active');
+            },
+
+            setActive: function(table_polymer){
                 // TODO: set siblings inactive
+                table_polymer.setAllRowsInactive();
 
                 Polymer.dom(this.$.row).classList.add('active');
             },
