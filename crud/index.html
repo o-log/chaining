@@ -58,6 +58,7 @@
 <link rel="import" href="bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="bower_components/paper-item/paper-item.html">
 <link rel="import" href="bower_components/paper-item/paper-item-body.html">
+<link rel="import" href="bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="public/crud_table_row.html">
 <link rel="import" href="public/crud_table.html">
 <link rel="import" href="public/crud_table_filter.html">
@@ -68,6 +69,7 @@
 <link rel="import" href="public/crud_table_cell_text.html">
 <link rel="import" href="public/crud_table_cell_timestamp.html">
 <link rel="import" href="public/crud_editor_field_input.html">
+<link rel="import" href="public/crud_editor_field_modelid.html">
 <link rel="import" href="public/crud_editor_field_textarea.html">
 <link rel="import" href="public/crud_editor_save_buttons.html">
 
@@ -82,8 +84,6 @@
     <div class="mdl-layout__drawer">
         <span class="mdl-layout-title">Drawer</span>
         <nav class="mdl-navigation">
-            <a class="mdl-navigation__link" href="">Link</a>
-            <a class="mdl-navigation__link" href="">Link</a>
         </nav>
     </div>
     <main class="mdl-layout__content">
@@ -98,9 +98,38 @@
     var classes_list_component = new crudClassesList.component();
     document.querySelector('#page-content').appendChild(classes_list_component);
 
+    initClassesList(classes_list_component);
+
     var hash = window.location.hash;
     if (hash){
         //classes_list_component.crud_updateFromHash(); // сейчас не заработает, потому что перед показом редактора для объекта модель должна быть загружена в хранилище. т.е. активировать редактор можно только после ответа от апи на запрос таблицы с фильтрами
+    }
+
+    function initClassesList(classes_list_component){
+        for (var class_name in crud.config) {
+            //var row_component = new CrudClassesListRow.component(class_name, classes_list_component);
+            //<a class="mdl-navigation__link" id="edit_link" href="#"></a>
+            var a = document.createElement('a');
+            a.classList.add('mdl-navigation__link');
+            var class_title = crud.getClassTitleByName(class_name);
+            a.textContent = class_title;
+            a.dataset.crud_class_name = class_name;
+
+            a.onclick = function(){
+                var class_name = this.dataset.crud_class_name;
+                var table_polymer = new CrudTable.component(class_name);
+
+                classes_list_component.crud_replaceChildren(table_polymer);
+
+                classes_list_component.crud_clearContexts();
+                classes_list_component.crud_updateContext(table_polymer, true);
+
+                return true;
+            };
+
+            document.querySelector('.mdl-navigation').appendChild(a);
+        }
+
     }
 
 </script>

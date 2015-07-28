@@ -5,7 +5,8 @@
     <style>
 
         paper-material {
-            padding: 10px;
+            padding: 20px;
+            background-color: white;
         }
 
         :host {
@@ -15,12 +16,16 @@
             /*border-top: 1px solid #ddd;*/
         }
 
+        paper-tabs {
+            background-color: #2196F3;
+        }
+
     </style>
 
     <template>
-        <!--<paper-material>-->
-            <paper-tabs id="tabs" selected="0">
-            </paper-tabs>
+        <paper-tabs id="tabs" selected="0">
+        </paper-tabs>
+        <paper-material>
             <iron-pages id="pages" selected="0">
                 <!--<div>
                     </content>
@@ -29,7 +34,7 @@
                     </div>
                 </div>-->
             </iron-pages>
-        <!--</paper-material>-->
+        </paper-material>
     </template>
 
     <script>
@@ -95,6 +100,9 @@
                                     break;
                                 case 'textarea':
                                     field_component = new CrudEditorFieldTextarea(obj_full_id, field_config.field_name, field_config.widget.params);
+                                    break;
+                                case 'model_id':
+                                    field_component = new CrudEditorFieldModelId(obj_full_id, field_config.field_name, field_config.widget.params);
                                     break;
                             }
 

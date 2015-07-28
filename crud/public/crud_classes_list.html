@@ -9,11 +9,6 @@
             height: 100%;
         }
 
-        #list_container {
-            padding: 20px;
-            border-bottom: 1px solid #ddd;
-        }
-
         #contexts_container {
             padding: 20px 20px 20px 20px;
             border-bottom: 1px solid #ddd;
@@ -31,11 +26,6 @@
     </style>
 
     <template>
-        <div>
-            <div id="list_container">
-                <content></content>
-                </div>
-        </div>
         <div id="contexts_container"></div>
         <div id="children_container"></div>
     </template>
@@ -46,11 +36,6 @@
                 is: "crud-classes-list",
 
                 ready: function () {
-                    for (var class_name in crud.config) {
-                        var row_component = new CrudClassesListRow.component(class_name, this);
-
-                        Polymer.dom(this).appendChild(row_component);
-                    }
                 },
 
                 crud_updateFromHash: function() {
@@ -90,6 +75,7 @@
                     var hash_str = JSON.stringify(hash);
 
                     var elem = document.createElement('div');
+                    elem.style.color = '#0D47A1';
                     elem.textContent = str;
 
                     var classes_list_polymer = this;

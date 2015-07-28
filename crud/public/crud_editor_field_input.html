@@ -4,15 +4,45 @@
 
     <style>
         :host {
-            /*display: block;
-            margin-top: 15px; margin-bottom: 15px;*/ /* fix displaying bug */
+            display: block;
+            padding-top: 20px; padding-bottom: 20px;
+        }
+
+        #label {
+            font-family: Roboto;
+            font-size: 16px;
+            text-align: right;
+            padding-right: 20px;
+            color: #757575;
+        }
+
+        #input {
+            font-family: Roboto;
+            font-size: 16px;
+            border: 0px;
+            border-bottom: 1px solid #E0E0E0;
+            border-top: 0px;
+            border-left: 0px;
+            border-right: 0px;
+            font-weight: 100;
         }
 
     </style>
 
     <template>
-        <div>
+        <!--<div>
             <paper-input id="input" label="label"></paper-input>
+
+        </div>-->
+        <div style="display: table; width: 100%;">
+            <div style="display: table-row;">
+                <div id="label" style="display: table-cell; width: 20%;">
+
+                </div>
+                <div style="display: table-cell;">
+                    <input id="input" style="width: 100%;">
+                </div>
+            </div>
         </div>
     </template>
 
@@ -23,10 +53,22 @@
             factoryImpl: function(obj_full_id, field_name, widget_params) {
 
                 var obj = storage._obj_arr[obj_full_id];
-
+                /*
                 this.$.input.value = obj[field_name];
                 this.$.input.label = field_name;
                 this.$.input.className += ' editor_field__' + field_name;
+                */
+
+                var title = field_name;
+                if (widget_params) {
+                    if (widget_params.title) {
+                        title = widget_params.title;
+                    }
+                }
+
+                this.$.input.value = obj[field_name];
+                this.$.label.textContent = title;
+                this.$.input.name = field_name;
             },
 
             ready: function(){

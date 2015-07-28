@@ -25,6 +25,7 @@
     "paper-checkbox": "PolymerElements/paper-checkbox#~1.0.5",
     "paper-toggle-button": "PolymerElements/paper-toggle-button#~1.0.5",
     "paper-material": "PolymerElements/paper-material#~1.0.1",
-    "paper-item": "PolymerElements/paper-item#~1.0.2"
+    "paper-item": "PolymerElements/paper-item#~1.0.2",
+    "paper-spinner": "PolymerElements/paper-spinner#~1.0.2"
   }
 }

@@ -1,0 +1,118 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<dom-module id="crud-editor-field-modelid">
+
+    <style>
+        :host {
+            display: block;
+            padding-top: 20px; padding-bottom: 20px;
+        }
+
+        #label {
+            font-family: Roboto;
+            font-size: 16px;
+            text-align: right;
+            padding-right: 20px;
+            color: #757575;
+        }
+
+        #input {
+            font-family: Roboto;
+            font-size: 16px;
+            border: 0px;
+            border-bottom: 1px solid #ccc;
+            border-top: 0px;
+            border-left: 0px;
+            border-right: 0px;
+        }
+
+        #link {
+            font-family: Roboto;
+            font-size: 16px;
+            cursor: pointer;
+            color: #01579B;
+        }
+    </style>
+
+    <template>
+        <div style="display: table; width: 100%;">
+            <div style="display: table-row;">
+                <div id="label" style="display: table-cell; width: 20%;">
+
+                </div>
+                <div id="link" on-click="linkClick" style="display: table-cell;">
+                    model name
+                </div>
+                <div style="display: table-cell; width: 20%;">
+                    <input id="input" style="width: 100%;">
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        CrudEditorFieldModelId = Polymer({
+            is: "crud-editor-field-modelid",
+            field_name: '',
+            params: {},
+
+            factoryImpl: function(obj_full_id, field_name, widget_params) {
+                this.field_name = field_name;
+                this.params = widget_params;
+
+                var obj = storage._obj_arr[obj_full_id];
+                var field_value = obj[field_name];
+
+                this.$.input.value = field_value;
+
+                var title = field_name;
+                if (widget_params) {
+                    if (widget_params.title) {
+                        title = widget_params.title;
+                    }
+                }
+
+                this.$.label.textContent = title;
+                this.$.input.name = field_name;
+
+                var api_url = 'localhost:3001';
+
+                var field_polymer = this;
+                var class_name = widget_params.class_name;
+
+                var query_url = 'http://' + api_url + '/api/' + class_name + '/' + field_value;
+
+                $.ajax({
+                    url: query_url, success: function (data) {
+                        obj._class_name = class_name;
+
+                        var obj_full_id = Model.getFullIdForObj(obj);
+                        storage.setObject(obj_full_id, obj);
+
+                        Polymer.dom(field_polymer.$.link).textContent = Model.getTitleForObj(obj);
+                    }
+                });
+
+            },
+
+            linkClick: function() {
+                var field_name = this.field_name;
+                var widget_params = this.params;
+
+                var reference_class_name = widget_params.class_name;
+                var hash = {class_name: reference_class_name};
+                var hash_str = JSON.stringify(hash);
+
+                window.location.hash = hash_str;
+                var classes_list_polymer =  document.getElementsByTagName('crud-classes-list')[0];
+                classes_list_polymer.crud_updateFromHash();
+
+            },
+
+            ready: function(){
+                //console.log('ready');
+            }
+        });
+    </script>
+
+</dom-module>

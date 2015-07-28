@@ -31,9 +31,9 @@ var crud = {
                         tab_title: 'поля',
                         fields: [
                             {field_name: 'nid', widget: {name: 'input'}},
-                            {field_name: 'title', widget: {name: 'textarea'}},
+                            {field_name: 'title', widget: {name: 'input'}},
                             {field_name: 'type', widget: {name: 'input'}},
-                            {field_name: 'url_alias', widget: {name: 'textarea'}}
+                            {field_name: 'url_alias', widget: {name: 'input'}}
                         ]
                     },
                     {
@@ -102,10 +102,10 @@ var crud = {
                     {
                         tab_title: 'поля',
                         fields: [
-                            {field_name: 'nid', widget: {name: 'input'}},
-                            {field_name: 'game_id', widget: {name: 'input'}},
-                            {field_name: 'title', widget: {name: 'textarea'}},
-                            {field_name: 'role', widget: {name: 'input'}}
+                            {field_name: 'nid', widget: {name: 'model_id', params: {title: 'Новость', class_name: 'node'}}},
+                            {field_name: 'game_id', widget: {name: 'input', params: {title: 'Матч'}}},
+                            {field_name: 'title', widget: {name: 'input', params: {title: 'Заголовок'}}},
+                            {field_name: 'role', widget: {name: 'input', params: {title: 'Роль'}}}
                         ]
                     }
                 ]
@@ -130,7 +130,7 @@ var crud = {
                         tab_title: 'поля',
                         fields: [
                             {field_name: 'node_id', widget: {name: 'input'}},
-                            {field_name: 'question', widget: {name: 'textarea'}},
+                            {field_name: 'question', widget: {name: 'input'}},
                             {field_name: 'published', widget: {name: 'input'}},
                             {field_name: 'created_at', widget: {name: 'input'}}
                         ]
@@ -162,7 +162,7 @@ var crud = {
                         tab_title: 'поля',
                         fields: [
                             {field_name: 'poll_id', widget: {name: 'input'}},
-                            {field_name: 'answer_text', widget: {name: 'textarea'}},
+                            {field_name: 'answer_text', widget: {name: 'input'}},
                             {field_name: 'likes_count', widget: {name: 'input'}}
                         ]
                     }
