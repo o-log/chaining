@@ -27,12 +27,6 @@
         </paper-tabs>
         <paper-material>
             <iron-pages id="pages" selected="0">
-                <!--<div>
-                    </content>
-                    <div style="text-align: right;">
-                        <paper-button raised onclick="return crudEditor.saveEditor();">Сохранить</paper-button>
-                    </div>
-                </div>-->
             </iron-pages>
         </paper-material>
     </template>
@@ -45,7 +39,7 @@
 
                 obj_full_id: '',
 
-                crud_getContextHash: function(){
+                crud_getContextHash: function () {
                     var hash = {};
 
                     hash.obj_full_id = this.obj_full_id;
@@ -54,7 +48,7 @@
                     return hash;
                 },
 
-                crud_getContextStr: function(){
+                crud_getContextStr: function () {
                     var str = '';
 
                     str += this.obj_full_id;
@@ -67,9 +61,17 @@
 
                     var obj = storage.getObject(obj_full_id);
 
-                    //this.$.title.textContent = Model.getTitleForObj(obj);
-
                     var page_index = 0; // вся жесть вокруг page_index изза почемуто невозможности выбрать список табов нормальным селектором и навесить онклики
+
+                    page_index = this.renderDataTabs(obj, page_index, table_polymer);
+                    page_index = this.renderLinkedModelsTabs(obj, page_index, table_polymer);
+
+                    // нужно, чтобы табы правильно отрисовались (какой-то баг?)
+                    this.$.pages.selected = 0;
+                    this.$.tabs.selected = 0;
+                },
+
+                renderDataTabs: function(obj, page_index, table_polymer){
                     var pages = this.$.pages;
 
                     var crud_config_for_class = crud.config[obj._class_name];
@@ -78,13 +80,16 @@
 
                         var tab = document.createElement("paper-tab");
                         tab.textContent = tab_config.tab_title;
-                        tab.dataset.page_index = page_index;
-                        tab.onclick = function(){
-                            pages.selected = this.dataset.page_index;
-                            var classes_list_polymer =  document.getElementsByTagName('crud-classes-list')[0];
-                            console.assert(classes_list_polymer);
-                            classes_list_polymer.crud_updateContext(table_polymer, false);
-                        };
+
+                        tab.onclick = function (page_index) {
+                            return function() {
+                                pages.selected = page_index;
+                                var classes_list_polymer = document.getElementsByTagName('crud-classes-list')[0];
+                                console.assert(classes_list_polymer);
+                                classes_list_polymer.crud_updateContext(table_polymer, false);
+                            }
+                        }(page_index);
+
                         Polymer.dom(this.$.tabs).appendChild(tab);
 
                         var page_element = document.createElement("div");
@@ -92,20 +97,7 @@
 
                         for (var field_index = 0; field_index < tab_config.fields.length; field_index++) {
                             var field_config = tab_config.fields[field_index];
-
-                            var field_component = null;
-                            switch (field_config.widget.name) {
-                                case 'input':
-                                    field_component = new CrudEditorFieldInput(obj_full_id, field_config.field_name, field_config.widget.params);
-                                    break;
-                                case 'textarea':
-                                    field_component = new CrudEditorFieldTextarea(obj_full_id, field_config.field_name, field_config.widget.params);
-                                    break;
-                                case 'model_id':
-                                    field_component = new CrudEditorFieldModelId(obj_full_id, field_config.field_name, field_config.widget.params);
-                                    break;
-                            }
-
+                            var field_component = this.createFieldEditorPolymer(obj, field_config);
                             Polymer.dom(page_element).appendChild(field_component);
                         }
 
@@ -115,46 +107,71 @@
                         page_index++;
                     }
 
+                    return page_index;
+                },
 
-                    if (crud_config_for_class.linked_models){
-                        for (var i in crud_config_for_class.linked_models){
+                createFieldEditorPolymer: function(obj, field_config) {
+                    var obj_full_id = Model.getFullIdForObj(obj);
+                    var field_component = null;
+
+                    switch (field_config.widget.name) {
+                        case 'input':
+                            field_component = new CrudEditorFieldInput(obj_full_id, field_config.field_name, field_config.widget.params);
+                            break;
+                        case 'textarea':
+                            field_component = new CrudEditorFieldTextarea(obj_full_id, field_config.field_name, field_config.widget.params);
+                            break;
+                        case 'model_id':
+                            field_component = new CrudEditorFieldModelId(obj_full_id, field_config.field_name, field_config.widget.params);
+                            break;
+                    }
+
+                    return field_component;
+                },
+
+                renderLinkedModelsTabs: function (obj_instance, page_index, table_polymer) {
+                    var crud_config_for_class = crud.config[obj_instance._class_name];
+
+                    if (crud_config_for_class.linked_models) {
+                        for (var i in crud_config_for_class.linked_models) {
                             var linked_model_config = crud_config_for_class.linked_models[i];
                             var linked_class_name = linked_model_config.class_name;
                             var link_field = linked_model_config.reference_field;
                             var filters_arr = [];
-                            filters_arr.push({'field_name': link_field, 'value': Model.getIdForObj(obj)});
+                            filters_arr.push({'field_name': link_field, 'value': Model.getIdForObj(obj_instance)});
 
                             var list = new CrudTable.component(linked_class_name, filters_arr);
-                            //crud.lists[class_name] = list;
 
                             var div = document.createElement("div");
                             div.appendChild(list);
 
                             Polymer.dom(this.$.pages).appendChild(div);
 
-                            var tab = document.createElement("paper-tab");
-                            tab.dataset.page_index = page_index;
-                            tab.onclick = function(){
-                                pages.selected = this.dataset.page_index;
-                                var classes_list_polymer =  document.getElementsByTagName('crud-classes-list')[0];
-                                console.assert(classes_list_polymer);
-                                classes_list_polymer.crud_updateContext(table_polymer, false);
-                            };
+                            var __tab_element = document.createElement("paper-tab");
 
+                            var closure_editor_polymer = this;
 
-                            tab.textContent = crud.getClassTitleByName(linked_class_name);
-                            Polymer.dom(this.$.tabs).appendChild(tab);
+                            __tab_element.onclick = function (page_index) { // функция для фиксации значения page_index в замыкании
+                                return function() {
+                                    closure_editor_polymer.$.pages.selected = page_index;
+
+                                    var classes_list_polymer = document.getElementsByTagName('crud-classes-list')[0];
+                                    classes_list_polymer.crud_updateContext(table_polymer, false);
+                                }
+                            }(page_index);
+
+                            __tab_element.textContent = crud.getClassTitleByName(linked_class_name);
+                            Polymer.dom(this.$.tabs).appendChild(__tab_element);
 
                             page_index++;
                         }
                     }
 
-                    // нужно, чтобы табы правильно отрисовались (какой-то баг?)
-                    this.$.pages.selected = 0;
-                    this.$.tabs.selected = 0;
+                    return page_index;
                 }
             }),
 
+            /*
             saveEditor: function () {
                 var obj_full_id = this.obj_full_id;
                 var obj = storage.getObject(obj_full_id);
@@ -177,6 +194,7 @@
                     socket.emit('update_object_field', data);
                 }
             }
+            */
         };
     </script>
 

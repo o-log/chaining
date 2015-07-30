@@ -71,9 +71,9 @@ var crud = {
                     {
                         tab_title: 'поля',
                         fields: [
-                            {field_name: 'name', widget: {name: 'textarea'}},
+                            {field_name: 'name', widget: {name: 'input'}},
+                            {field_name: 'fullname', widget: {name: 'input'}},
                             {field_name: 'value', widget: {name: 'textarea'}},
-                            {field_name: 'fullname', widget: {name: 'textarea'}},
                             {field_name: 'description', widget: {name: 'textarea'}},
                             {field_name: 'weight', widget: {name: 'input'}}
                         ]
