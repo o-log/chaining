@@ -2,6 +2,45 @@ var crud = {
         //lists: {},
 
         config: {
+            auth: {
+                title: 'пользователи',
+                id_field_name: 'auth_id',
+                title_field_name: 'auth_name',
+                table: {
+                    search_fields: [
+                        {
+                            field_name: 'auth_id'
+                        }
+                    ],
+                    order_fields: [
+                        {
+                            field_name: 'auth_id'
+                        }
+                    ],
+                    columns: [
+                        {
+                            field_name: 'auth_name', widget: {name: 'text', params: {edit_link: true}}
+                        },
+                        {
+                            field_name: 'auth_email', widget: {name: 'text', params: {edit_link: false}}
+                        }
+                    ]
+                },
+                editor: [
+                    {
+                        tab_title: 'поля',
+                        fields: [
+                            {field_name: 'auth_id', widget: {name: 'input'}},
+                            {field_name: 'auth_name', widget: {name: 'input'}},
+                            {field_name: 'auth_email', widget: {name: 'input'}}
+                        ]
+                    }
+                ],
+                linked_models: [
+                    {class_name: 'poll', reference_field: 'node_id'},
+                    {class_name: 'game_media', reference_field: 'nid'}
+                ]
+            },
             node: {
                 title: 'материалы',
                 id_field_name: 'nid',

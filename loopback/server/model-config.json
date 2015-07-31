@@ -36,6 +36,10 @@
     "dataSource": "db",
     "public": true
   },
+  "auth": {
+    "dataSource": "db-auth",
+    "public": true
+  },
   "block": {
     "dataSource": "db-news",
     "public": true

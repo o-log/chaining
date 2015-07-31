@@ -1,0 +1,36 @@
+<html ng-app="phonecatApp">
+<head>
+    <script src="bower_components/angular/angular.js"></script>
+    <script>
+        var phonecatApp = angular.module('phonecatApp', []);
+
+        phonecatApp.controller('PhoneListCtrl', function ($scope, $http) {
+            /*
+            $scope.phones = [
+                {'name': 'Nexus S',
+                    'snippet': 'Fast just got faster with Nexus S.'},
+                {'name': 'Motorola XOOM™ with Wi-Fi',
+                    'snippet': 'The Next, Next Generation tablet.'},
+                {'name': 'MOTOROLA XOOM™',
+                    'snippet': 'The Next, Next Generation tablet.'}
+            ];
+            */
+
+            $http.get('http://localhost:3001/api/auth?1=1&filter[limit]=100').success(function(data) {
+                $scope.phones = data;
+            });
+
+        });
+    </script>
+</head>
+<body ng-controller="PhoneListCtrl">
+
+<ul>
+    <li ng-repeat="phone in phones">
+        <span>{{phone.auth_id}}</span>
+        <p>{{phone.auth_name}}</p>
+    </li>
+</ul>
+
+</body>
+</html>

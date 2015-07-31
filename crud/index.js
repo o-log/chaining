@@ -21,6 +21,9 @@ app.use('/bower_components', express.static('bower_components'));
 app.get('/', function(req, res){
     res.sendFile(__dirname + '/index.html');
 });
+app.get('/ng.html', function(req, res){
+    res.sendFile(__dirname + '/ng.html');
+});
 app.get('/favicon.ico', function(req, res){
     res.sendFile(__dirname + '/favicon.ico');
 });
