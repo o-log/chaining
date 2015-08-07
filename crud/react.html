@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>RCRUD 2015</title>
+
+    <script src="https://storage.googleapis.com/code.getmdl.io/1.0.2/material.min.js"></script>
+    <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.2/material.indigo-pink.min.css">
+    <!-- Material Design icon font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/JSXTransformer.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+    <script src="public/crud.js"></script>
+    <script type="text/jsx" src="react_crud/CrudTable.js"></script>
+    <script type="text/jsx" src="react_crud/CrudList.js"></script>
+    <script type="text/jsx" src="react_crud/CrudListRow.js"></script>
+    <script type="text/jsx" src="react_crud/CrudClassesList.js"></script>
+    <script type="text/jsx" src="react_crud/CrudClass.js"></script>
+    <script type="text/jsx" src="react_crud/CrudListCell.js"></script>
+    <script type="text/jsx" src="react_crud/CrudEditor.js"></script>
+    <script type="text/jsx" src="react_crud/CrudEditorTab.js"></script>
+
+</head>
+<body>
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+            <!-- Title -->
+            <span class="mdl-layout-title">RCRUD 2015</span>
+            <!-- Add spacer, to align navigation to the right -->
+            <div class="mdl-layout-spacer"></div>
+            <!-- Navigation. We hide it in small screens. -->
+            <nav class="mdl-navigation mdl-layout--large-screen-only">
+                <a class="mdl-navigation__link" href="">Link</a>
+                <a class="mdl-navigation__link" href="">Link</a>
+                <a class="mdl-navigation__link" href="">Link</a>
+                <a class="mdl-navigation__link" href="">Link</a>
+            </nav>
+        </div>
+    </header>
+    <div class="mdl-layout__drawer">
+        <span class="mdl-layout-title">Title</span>
+        <nav class="mdl-navigation" id="classes_list"></nav>
+    </div>
+    <main class="mdl-layout__content">
+        <div class="page-content" style="padding: 20px;" id="crud"></div>
+    </main>
+</div>
+
+<script type="text/jsx">
+
+    var crud_table_rendered = React.render(
+            React.createElement(
+                    CrudTable,
+                    {class_name: "keyvalue2_items"}
+
+            ),
+            document.getElementById('crud')
+    );
+
+    React.render(
+            <CrudClassesList table_react={crud_table_rendered}/>,
+            document.getElementById('classes_list')
+    );
+
+</script>
+</body>
+</html>

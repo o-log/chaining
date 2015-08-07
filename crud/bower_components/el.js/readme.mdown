@@ -1,0 +1,114 @@
+## el.js
+
+Simple Javascript library used to create elements, no other libraries required
+
+## Examples:
+
+### Creation of elements
+
+Create a simple element without attributes
+
+    el('div')
+    => <div></div>
+
+Some vanity methods/aliases to help you create elements quickly
+
+    # Vanity helpers
+    el.div()
+    el.p()
+    el.input()
+    el.img({'src':'http://placekitten.com/200/300'})
+    el.a({'src':'http://placekitten.com/200/300'})
+
+For backwards compatibility you can still access el() via the older create methods
+
+    el.create()
+    el.c()
+
+### Lets add some content on creation of elements
+
+There are a few ways to create elements with content inside. The easiest way is to pass it in via the second parameter
+
+    el('div', 'Some content')
+    => <div>Some content</div>
+    
+If you pass in a html node as the second attribute, it'll be added as a child
+
+    el('ul',
+      el('li', 'item 1')
+    )
+    => <ul><li>item 1</li></ul>
+
+If you want to create a set of li's then you can pass in an array
+
+    el('ul', [
+      el('li', 'item 1'),
+      el('li', 'item 2'),
+      el('li', 'item 3'),
+      el('li', 'item 4'),
+      el('li', 'item 5'),
+      el('li', 'item 6')
+      ]
+    )
+    => <ul><li>item 1</li><li>item 2</li><li>item 3</li><li>item 4</li><li>item 5</li><li>item 6</li></ul>
+
+For backwards compatibility you can still add content via 'content'
+
+    el('li', {'content':'item 1'})
+
+
+### Add attributes to your elements
+
+You could use selectors in the initial name to quick create with id's and classes
+
+    el('div#myId.content')
+    => <div id="myId" class="content"></div>
+
+    el('div.row')
+    => <div class="row"></div>
+
+el also allows a key:value json object to be passed through as the second attribute
+
+    el('div.row', {'id':'myId', 'class':'my_class'})
+    => <div id="myId" class="my_class row"></div>
+
+    el('a', {'class':'content', 'href':'https://github.com/markgandolfo/el.js', } 'content' )
+    => <a class="content" href="https://github.com/markgandolfo/el.js">el.js</a>
+
+Create data-attributes (or any other attributes)
+
+    el('div', {'data-action':'submit', 'id':'myId'})
+    => <div data-action="submit" id="myId"></div>
+
+### Callbacks:
+
+You can now pass a function in as a callback. 
+
+    el('div', function(done) {
+      console.log('this will be called after the creation of the div');
+    })
+
+### Examples of creating elements with id, classes, attributes, content and callbacks
+
+    el('ul.navbar', {'data-name':'navigation'}, [
+      el('li', 'item 1'), 
+      el('li', 'item 1'), 
+      function(element) {
+        this.addEventListener('click', function() {
+          console.log('clicking on the navigation');
+        })
+      }]
+    )
+
+## License
+
+See the license file
+
+## Contributing
+
+1. Fork it
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Write tests
+4. Commit your changes (`git commit -am 'Add some feature'`)
+5. Push to the branch (`git push -u origin my-new-feature`)
+6. Create new Pull Request

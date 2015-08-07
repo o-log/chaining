@@ -16,6 +16,8 @@ var app = express();
 var http = require('http').Server(app);
 //var io = require('socket.io')(http);
 app.use('/public', express.static('public'));
+app.use('/react_crud', express.static('react_crud'));
+app.use('/vanilla_crud', express.static('vanilla_crud'));
 app.use('/bower_components', express.static('bower_components'));
 
 app.get('/', function(req, res){
@@ -23,6 +25,12 @@ app.get('/', function(req, res){
 });
 app.get('/ng.html', function(req, res){
     res.sendFile(__dirname + '/ng.html');
+});
+app.get('/react.html', function(req, res){
+    res.sendFile(__dirname + '/react.html');
+});
+app.get('/vanilla.html', function(req, res){
+    res.sendFile(__dirname + '/vanilla.html');
 });
 app.get('/favicon.ico', function(req, res){
     res.sendFile(__dirname + '/favicon.ico');

@@ -80,7 +80,7 @@
                 var field_polymer = this;
                 var class_name = widget_params.class_name;
 
-                var query_url = 'http://' + api_url + '/api/' + class_name + '/' + field_value;
+                var query_url = 'http://' + api_url + '/' + class_name + '/' + field_value;
 
                 $.ajax({
                     url: query_url, success: function (data) {

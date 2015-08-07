@@ -1,6 +1,4 @@
 var crud = {
-        //lists: {},
-
         config: {
             auth: {
                 title: 'пользователи',
@@ -101,7 +99,7 @@ var crud = {
                     ],
                     columns: [
                         {
-                            field_name: 'name',
+                            field_name: 'fullname',
                             widget: {name: 'text', params: {edit_link: true}}
                         }
                     ]
@@ -408,8 +406,16 @@ var crud = {
             }
         },
 
+        getClassConfig: function (class_name) {
+            return crud.config[class_name];
+        },
+
         getClassTitleByName: function (class_name) {
-            var crud_class_config = crud.config[class_name];
+            var crud_class_config = crud.getClassConfig(class_name);
+            if (!crud_class_config){
+                return '';
+            }
+
             var class_title = crud_class_config.title;
             if (!class_title) {
                 class_title = class_name;
@@ -417,5 +423,4 @@ var crud = {
 
             return class_title;
         }
-
 };

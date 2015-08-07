@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>VCRUD 2015</title>
+
+    <script src="https://storage.googleapis.com/code.getmdl.io/1.0.2/material.min.js"></script>
+    <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.2/material.indigo-pink.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+    <script src="bower_components/el.js/el.js"></script>
+
+    <script src="public/crud.js"></script>
+
+    <script src="vanilla_crud/VComponent.js"></script>
+
+    <script src="vanilla_crud/VCrudTableCell.js"></script>
+    <script src="vanilla_crud/VCrudTableRow.js"></script>
+    <script src="vanilla_crud/VCrudTable.js"></script>
+    <script src="vanilla_crud/VCrudEditor.js"></script>
+    <script src="vanilla_crud/VCrudEditorTab.js"></script>
+    <script src="vanilla_crud/VCrudClassesList.js"></script>
+    <script src="vanilla_crud/VCrudClassesListRow.js"></script>
+
+</head>
+<body>
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+            <!-- Title -->
+            <span class="mdl-layout-title">VCRUD 2015</span>
+            <!-- Add spacer, to align navigation to the right -->
+            <div class="mdl-layout-spacer"></div>
+            <!-- Navigation. We hide it in small screens. -->
+            <nav class="mdl-navigation mdl-layout--large-screen-only">
+                <a class="mdl-navigation__link" href="">Link</a>
+                <a class="mdl-navigation__link" href="">Link</a>
+                <a class="mdl-navigation__link" href="">Link</a>
+                <a class="mdl-navigation__link" href="">Link</a>
+            </nav>
+        </div>
+    </header>
+    <div class="mdl-layout__drawer">
+        <span class="mdl-layout-title">Title</span>
+        <nav class="mdl-navigation" id="classes_list_container">
+            <div>123</div>
+        </nav>
+    </div>
+    <main class="mdl-layout__content">
+        <div class="page-content" style="padding: 20px;" id="crud_container"></div>
+    </main>
+</div>
+
+<script type="text/javascript">
+    "use strict";
+
+    var crud_container_element = document.getElementById('crud_container');
+    var crud_obj = new VCrudTable();
+    crud_obj.mountTo(crud_container_element);
+    crud_obj.setClassName('node');
+
+    var classes_list_container = document.getElementById('classes_list_container');
+    var list_obj = new VCrudClassesList(crud_obj);
+    list_obj.mountTo(classes_list_container);
+
+</script>
+</body>
+</html>

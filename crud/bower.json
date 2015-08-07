@@ -27,6 +27,7 @@
     "paper-material": "PolymerElements/paper-material#~1.0.1",
     "paper-item": "PolymerElements/paper-item#~1.0.2",
     "paper-spinner": "PolymerElements/paper-spinner#~1.0.2",
-    "ng-admin": "~0.7.0"
+    "ng-admin": "~0.7.0",
+    "el.js": "*"
   }
 }

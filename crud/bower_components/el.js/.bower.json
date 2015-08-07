@@ -1,0 +1,27 @@
+{
+  "name": "el.js",
+  "homepage": "https://github.com/markgandolfo/el.js",
+  "authors": [
+    "Mark Gandolfo <mark@gandolfo.com.au>"
+  ],
+  "description": "native javascript class and methods to create dom objects",
+  "main": "el.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "_release": "df2530ecbe",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "df2530ecbe949d877787c010eb329d204b4a7f67"
+  },
+  "_source": "git://github.com/markgandolfo/el.js.git",
+  "_target": "*",
+  "_originalSource": "el.js",
+  "_direct": true
+}

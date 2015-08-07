@@ -1,36 +1,224 @@
-<html ng-app="phonecatApp">
+<html ng-app="myApp">
 <head>
     <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/restangular/src/restangular.js"></script>
+    <link rel="stylesheet" href="bower_components/ng-admin/build/ng-admin.min.css">
+    <script src="bower_components/ng-admin/build/ng-admin.min.js"></script>
+
     <script>
-        var phonecatApp = angular.module('phonecatApp', []);
+        var app = angular.module('myApp', ['ng-admin']);
 
-        phonecatApp.controller('PhoneListCtrl', function ($scope, $http) {
-            /*
-            $scope.phones = [
-                {'name': 'Nexus S',
-                    'snippet': 'Fast just got faster with Nexus S.'},
-                {'name': 'Motorola XOOM™ with Wi-Fi',
-                    'snippet': 'The Next, Next Generation tablet.'},
-                {'name': 'MOTOROLA XOOM™',
-                    'snippet': 'The Next, Next Generation tablet.'}
-            ];
-            */
+        app.config(function(NgAdminConfigurationProvider) {
+            var nga = NgAdminConfigurationProvider;
+            // set the main API endpoint for this admin
+            var admin = nga.application('My backend')
+                    .baseApiUrl('http://localhost:3001/');
 
-            $http.get('http://localhost:3001/api/auth?1=1&filter[limit]=100').success(function(data) {
-                $scope.phones = data;
-            });
+            // define an entity mapped by the http://localhost:3000/posts endpoint
+            var blocks = nga.entity('blocks');
+            admin.addEntity(blocks);
 
+            // set the list of fields to map in each post view
+            blocks.listView()
+                    .title('BLOCKS') // default title is "[Entity_name] list"
+                //.description('List of posts with infinite pagination') // description appears under the title
+                //.infinitePagination(true) // load pages as the user scrolls
+                    .fields([
+                        nga.field('id').label('ID'),
+                        nga.field('title'),
+                        nga.field('region'),
+                        nga.field('info'),
+                        //nga.field('published_at', 'date'), // Date field type allows date formatting
+                        //nga.field('views', 'number'),
+                        /*
+                         nga.field('tags', 'reference_many') // a Reference is a particular type of field that references another entity
+                         .targetEntity(tag) // the tag entity is defined later in this file
+                         .targetField(nga.field('name')) // the field to be displayed in this list*/
+                    ])
+                .filters([
+                nga.field('region')
+                            ])
+                //.listActions(['show', 'edit', 'delete'])
+            ;
+
+            blocks.creationView()
+                    .fields([
+                        nga.field('info'),
+                        nga.field('title') // the default edit field type is "string", and displays as a text input
+                                .attributes({ placeholder: 'the post title' }) // you can add custom attributes, too
+                                .validation({ required: true, minlength: 3, maxlength: 100 }), // add validation rules for fields
+                        nga.field('body', 'text'), // overriding the type allows rich text editing for the body
+                        nga.field('php_is_safe', 'boolean'),
+                        //nga.field('published_at', 'date'), // Date field type translates to a datepicker
+                        nga.field('pages', 'text'), // text field type translates to a textarea
+                        nga.field('region'),
+                        nga.field('weight'),
+                        nga.field('cache'),
+                    ]);
+
+            blocks.editionView()
+                    .title('Edit post "{{ entry.values.title }}"') // title() accepts a template string, which has access to the entry
+                    .actions(['list', 'show', 'delete']) // choose which buttons appear in the top action bar. Show is disabled by default
+                    .fields([
+                        blocks.creationView().fields(), // fields() without arguments returns the list of fields. That way you can reuse fields from another view to avoid repetition
+                        /*
+                         nga.field('tags', 'reference_many') // reference_many translates to a select multiple
+                         .targetEntity(tag)
+                         .targetField(nga.field('name'))
+                         .cssClasses('col-sm-4'), // customize look and feel through CSS classes
+                         */
+                            /*
+                        nga.field('views', 'number')
+                                .cssClasses('col-sm-4'),
+                                */
+                        /*
+                         nga.field('comments', 'referenced_list') // display list of related comments
+                         .targetEntity(comment)
+                         .targetReferenceField('post_id')
+                         .targetFields([
+                         nga.field('id'),
+                         nga.field('body').label('Comment')
+                         ])
+                         */
+                    ]);
+
+            var poll = nga.entity('poll');
+            admin.addEntity(poll);
+
+            var poll_answer = nga.entity('poll_answer');
+            admin.addEntity(poll_answer);
+
+            poll_answer.creationView()
+                    .fields([
+                        nga.field('id').label('ID'),
+                        nga.field('answer_text'),
+                        nga.field('poll_id', 'reference')
+                                .label('Poll')
+                                //.map(truncate) // Allows to truncate values in the select
+                                .targetEntity(poll) // Select a target Entity
+                                .targetField(nga.field('question')) // Select a label Field
+                    ]);
+
+            poll_answer.editionView()
+                    .title('Edit answer "{{ entry.values.answer_text}}"') // title() accepts a template string, which has access to the entry
+                    .actions(['list', 'show', 'delete']) // choose which buttons appear in the top action bar. Show is disabled by default
+                    .fields([
+                        poll_answer.creationView().fields(), // fields() without arguments returns the list of fields. That way you can reuse fields from another view to avoid repetition
+                        /*
+                         nga.field('tags', 'reference_many') // reference_many translates to a select multiple
+                         .targetEntity(tag)
+                         .targetField(nga.field('name'))
+                         .cssClasses('col-sm-4'), // customize look and feel through CSS classes
+                         */
+                        /*
+                         nga.field('views', 'number')
+                         .cssClasses('col-sm-4'),
+                         */
+                        /*
+                         nga.field('comments', 'referenced_list') // display list of related comments
+                         .targetEntity(comment)
+                         .targetReferenceField('post_id')
+                         .targetFields([
+                         nga.field('id'),
+                         nga.field('body').label('Comment')
+                         ])
+                         */
+                    ]);
+
+
+
+            poll.listView()
+                    .title('POLLS') // default title is "[Entity_name] list"
+                //.description('List of posts with infinite pagination') // description appears under the title
+                .infinitePagination(true) // load pages as the user scrolls
+                    .fields([
+                        nga.field('id').label('ID'),
+                        nga.field('question'),
+                        //nga.field('published_at', 'date'), // Date field type allows date formatting
+                        //nga.field('views', 'number'),
+                        /*
+                         nga.field('tags', 'reference_many') // a Reference is a particular type of field that references another entity
+                         .targetEntity(tag) // the tag entity is defined later in this file
+                         .targetField(nga.field('name')) // the field to be displayed in this list*/
+                    ])
+                //.listActions(['show', 'edit', 'delete'])
+            ;
+
+            poll.creationView()
+                    .fields([
+                        nga.field('id').label('ID'),
+                        nga.field('question'),
+                    ]);
+
+            poll.editionView()
+                    .title('Edit poll "{{ entry.values.question}}"') // title() accepts a template string, which has access to the entry
+                    .actions(['list', 'show', 'delete']) // choose which buttons appear in the top action bar. Show is disabled by default
+                    .fields([
+                        poll.creationView().fields(), // fields() without arguments returns the list of fields. That way you can reuse fields from another view to avoid repetition
+                        nga.field('poll_answer', 'referenced_list') // Define a N-1 relationship with the comment entity
+                                .label('Answers')
+                                .targetEntity(poll_answer) // Target the comment Entity
+                                .targetReferenceField('poll_id') // Each comment with post_id = post.id (the identifier) will be displayed
+                                .targetFields([ // Display comment field to display
+                                    nga.field('id').label('ID'),
+                                    nga.field('answer_text').label('Comment')
+                                ])
+                        /*
+                         nga.field('tags', 'reference_many') // reference_many translates to a select multiple
+                         .targetEntity(tag)
+                         .targetField(nga.field('name'))
+                         .cssClasses('col-sm-4'), // customize look and feel through CSS classes
+                         */
+                        /*
+                         nga.field('views', 'number')
+                         .cssClasses('col-sm-4'),
+                         */
+                        /*
+                         nga.field('comments', 'referenced_list') // display list of related comments
+                         .targetEntity(comment)
+                         .targetReferenceField('post_id')
+                         .targetFields([
+                         nga.field('id'),
+                         nga.field('body').label('Comment')
+                         ])
+                         */
+                    ]);
+
+            blocks.showView() // a showView displays one entry in full page - allows to display more data than in a a list
+                    .fields([
+                        nga.field('id'),
+                        blocks.editionView().fields(), // reuse fields from another view in another order
+                        nga.field('custom_action', 'template')
+                                .template('<other-page-link></other-link-link>')
+                    ]);
+
+            nga.configure(admin);
         });
+
+        app.config(function(RestangularProvider) {
+            RestangularProvider.addFullRequestInterceptor(function(element, operation, what, url, headers, params, httpConfig) {
+                if (operation == 'getList') {
+                    params['filter[skip]'] = (params._page - 1) * params._perPage;
+                    params['filter[limit]'] = params._perPage;
+
+                    if (params._filters) {
+                        for (param in params._filters) {
+                            params['filter[where][' + param + ']'] = params._filters[param];
+                        }
+                    }
+
+                    //params.end = params._perPage;
+                    delete params._page;
+                    delete params._perPage;
+                }
+                return { params: params };
+            });
+        });
+
     </script>
 </head>
-<body ng-controller="PhoneListCtrl">
 
-<ul>
-    <li ng-repeat="phone in phones">
-        <span>{{phone.auth_id}}</span>
-        <p>{{phone.auth_name}}</p>
-    </li>
-</ul>
-
+<body ng-app="myApp"  ng-strict-di>
+<div ui-view></div>
 </body>
 </html>
