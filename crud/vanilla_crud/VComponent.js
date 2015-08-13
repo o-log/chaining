@@ -2,6 +2,7 @@
 
 class VComponent {
     constructor() {
+        // TODO: уйти от глобальной переменной?
         if (!window._jhfbvkjsdbvjhksfv){
             window._jhfbvkjsdbvjhksfv = 0;
         }
@@ -15,6 +16,6 @@ class VComponent {
     }
 
     localElementId(id) {
-        return this._id + ':' + id;
+        return 'a' + this._id + '__' + id;
     }
 }

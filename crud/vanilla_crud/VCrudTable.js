@@ -24,6 +24,7 @@ class VCrudTable extends VComponent {
                 [
                     el('div', {style: 'display: table-cell'},
                         [
+                            el('div', {id: this.localElementId('filters_container'), style: 'padding: 20px; background-color: silver;'}),
                             el('table', {class: "mdl-data-table mdl-js-data-table mdl-data-table--selectable"},
                                 [
                                     el('thead',
@@ -60,10 +61,42 @@ class VCrudTable extends VComponent {
         }
     }
 
+    renderFilters() {
+        var filters_container_element = this.getElementByLocalId('filters_container');
+        filters_container_element.innerHTML = '';
+
+        var class_name = this.class_name;
+        var class_config = crud.getClassConfig(class_name);
+        console.assert(class_config);
+        var table_config = class_config.table;
+        console.assert(table_config);
+        var filters_config = table_config.search_fields;
+        if (!filters_config){
+            return;
+        }
+
+        for (var filter_index in filters_config) {
+            var filter_config = filters_config[filter_index];
+            var filter_obj = new VCrudFilter(filter_config, this);
+            filter_obj.mountTo(filters_container_element);
+        }
+    }
+
+    /**
+     * таблица выводит список объектов указанного класса
+     * фильтры и сортировки заполняются параметрами по умолчанию из конфига круда для класса
+     * @param class_name
+     */
     setClassName(class_name) {
         this.class_name = class_name;
 
-        var url = 'http://localhost:3001/' + this.class_name;
+        this.renderFilters();
+
+        this.makeApiRequest();
+    }
+
+    makeApiRequest() {
+        var url = crud.config.api_url + this.class_name;
 
         $.ajax({
             url: url,

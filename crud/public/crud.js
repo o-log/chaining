@@ -1,5 +1,6 @@
 var crud = {
         config: {
+            api_url: 'http://localhost:3001/',
             auth: {
                 title: 'пользователи',
                 id_field_name: 'auth_id',

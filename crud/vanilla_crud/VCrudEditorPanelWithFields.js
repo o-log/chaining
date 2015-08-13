@@ -1,22 +1,28 @@
 "use strict";
 
-class VCrudEditorTab {
-    constructor(obj, tab_index, tab_config, table_obj){
+class VCrudEditorPanelWithFields extends VComponent {
+    constructor(obj, tab_config, table_obj){
+        super();
+
         this.obj = obj;
-        this.tab_index = tab_index;
         this.tab_config = tab_config;
         this.table_obj = table_obj;
     }
 
-    mountTo(container_element){
-        var panel_element = el('div', {class: "mdl-tabs__panel", id: "editor_tab" + this.tab_index});
-        componentHandler.upgradeElement(panel_element);
+    getSwitcherId(){
+        return this.localElementId("panel");
+    }
 
+    mountTo(panels_container, tabs_container){
+        console.assert(panels_container);
+        console.assert(tabs_container);
+
+        var panel_element = el('div', {class: "mdl-tabs__panel", id: this.getSwitcherId()});
+        panels_container.appendChild(panel_element);
+        componentHandler.upgradeElement(panel_element);
 
         var obj = this.obj;
         console.assert(obj);
-
-        //var res = [];
 
         var tab_config = this.tab_config;
         console.assert(tab_config);
@@ -35,12 +41,15 @@ class VCrudEditorTab {
                     el('label', {class: "mdl-textfield__label", for: "sample3"}, field_name)
                 ]
             );
-            componentHandler.upgradeElement(field);
 
             panel_element.appendChild(field);
-
+            componentHandler.upgradeElement(field);
         }
 
-        container_element.appendChild(panel_element);
+
+        tabs_container.appendChild(
+            el('a', {href: "#" + this.getSwitcherId(), class: "mdl-tabs__tab"}, tab_config.tab_title)
+        );
+
     }
 }
