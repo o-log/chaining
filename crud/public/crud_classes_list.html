@@ -1,125 +1,39 @@
 <link rel="import" href="/bower_components/polymer/polymer.html">
 
 <dom-module id="crud-classes-list">
-
-    <!-- scoped CSS for this element -->
-    <style>
-        :host {
-            /*display: block;*/
-            height: 100%;
-        }
-
-        #contexts_container {
-            padding: 20px 20px 20px 20px;
-            border-bottom: 1px solid #ddd;
-            font-family: Roboto;
-            font-size: 16px;
-        }
-
-        #contexts_container div {
-            color: #0D47A1;
-        }
-
-        #contexts_container :last-child {
-            color: #ccc;
-        }
-
-        #children_container {
-        }
-
-    </style>
-
     <template>
-        <div id="contexts_container"></div>
-        <div id="children_container"></div>
     </template>
 
     <script>
-        var crudClassesList = {
-            component: Polymer({
-                is: "crud-classes-list",
+        /**
+         * здесь не используется шаблон, а дочерние элементы добавляются в навигацию напрямую, потому что наличие дополнительных элементов в навигации ломает ее вид
+         */
+        var crudClassesList = Polymer({
+            is: "crud-classes-list",
+            crud_main_polymer: null,
 
-                ready: function () {
-                },
+            ready: function () {
+                for (var class_name in crud.config) {
+                     var a = el('a', {class: 'mdl-navigation__link'}, crud.getClassTitleByName(class_name));
+                     a.onclick = this.classOnClick.bind(this, class_name);
 
-                crud_updateFromHash: function() {
-                    var hash = window.location.hash;
-
-                    // remove leading hash
-                    if (hash.substring(0, 1) == '#'){
-                        hash = hash.substring(1);
-                    }
-
-                    var hash_obj = JSON.parse(hash);
-
-                    //this.$.contexts_container.innerHTML = '';
-                    //this.children_container.innerHTML = '';
-
-                    var table_polymer = new CrudTable.component(hash_obj.class_name, hash_obj.filters);
-                    if (hash_obj.editor) {
-                        var obj_full_id = hash_obj.editor.obj_full_id;
-                        var editor_component = new crudEditor.component(obj_full_id, table_polymer);
-                        table_polymer.crud_setActiveEditor(editor_component);
-                    }
-
-                    this.crud_replaceChildren(table_polymer);
-
-                },
-
-                crud_clearContexts: function(){
-                    var contexts_container = this.$.contexts_container;
-                    contexts_container.innerHTML = '';
-                },
-
-                crud_updateContext: function(crud_table_polymer, append) {
-                    var contexts_container = this.$.contexts_container;
-
-                    var hash = crud_table_polymer.crud_getContextHash();
-                    var str = crud_table_polymer.crud_getContextStr();
-                    var hash_str = JSON.stringify(hash);
-
-                    var elem = document.createElement('div');
-                    elem.textContent = str;
-
-                    var classes_list_polymer = this;
-
-                    elem.onclick = function(){
-                        // стираем из истории контекстов выбранный контекст и все последующие
-                        // потом, при переходе на выбранный контекст он снова допишется в конец истории и станет текущим
-                        var nodes = Polymer.dom(classes_list_polymer.$.contexts_container).childNodes;
-                        if (nodes.length){
-                            var after_this = false;
-                            for (var i = 0; i < nodes.length; i++){
-                                var node = nodes[i];
-                                if ((node == this) || after_this){
-                                    Polymer.dom(classes_list_polymer.$.contexts_container).removeChild(node);
-                                    after_this = true;
-                                }
-                            }
-                        }
-
-                        window.location.hash = hash_str;
-                        classes_list_polymer.crud_updateFromHash();
-                    };
-
-                    if (!append) {
-                        var lc = Polymer.dom(contexts_container).lastChild;
-                        if (lc) {
-                            Polymer.dom(contexts_container).removeChild(lc);
-                        }
-                    }
-                    Polymer.dom(contexts_container).appendChild(elem);
-
-                    window.location.hash = hash_str;
-                },
-
-                crud_replaceChildren: function(list) {
-                    var children_container = this.$.children_container;
-                    Polymer.dom(children_container).innerHTML = '';
-                    Polymer.dom(children_container).appendChild(list)
+                    document.querySelector('.mdl-navigation').appendChild(a); // см. камент выше
                 }
-            })
-        };
+            },
+
+            classOnClick: function (class_name) {
+                var crud_main_polymer = document.querySelector('crud-main');
+
+                var table_polymer = new CrudTable.component(class_name);
+                crud_main_polymer.crud_replaceChildren(table_polymer);
+
+                crud_main_polymer.crud_clearContexts();
+                crud_main_polymer.crud_updateContext(table_polymer, true);
+
+                return true;
+            }
+
+        });
     </script>
 
 </dom-module>

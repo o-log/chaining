@@ -11,7 +11,16 @@ class VCrudFilter extends VComponent {
         this.table_obj = table_obj;
     }
 
-    mountTo(element){
+    getValue(){
+        var input_element = this.getElementByLocalId('input');
+        return input_element.value;
+    }
+
+    onChange(){
+        alert('change');
+    }
+
+    renderTo(element){
         console.assert(element);
         this.container_element = element;
 
@@ -19,10 +28,12 @@ class VCrudFilter extends VComponent {
             el('div',
                 [
                     el('span', this.filter_config.field_name),
-                    el('input')
+                    el('input', {id: this.localElementId('input')})
                 ]
             )
         );
 
+        var input_element = this.getElementByLocalId('input');
+        input_element.onkeyup=this.onChange.bind(this);
     }
 }

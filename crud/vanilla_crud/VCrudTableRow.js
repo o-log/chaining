@@ -9,8 +9,9 @@ class VCrudTableRow {
 
     mount(container){
         var a = el('tr');
+        container.appendChild(a);
 
-        var class_config = crud.getClassConfig(this.class_name);
+        var class_config = crud_main.getClassConfig(this.class_name);
         console.assert(class_config);
         console.assert(class_config.table);
         console.assert(class_config.table.columns);
@@ -21,7 +22,6 @@ class VCrudTableRow {
             cell_obj.mount(a);
         }
 
-        container.appendChild(a);
         componentHandler.upgradeElement(a);
     }
 }

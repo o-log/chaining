@@ -11,7 +11,7 @@ class VCrudTable extends VComponent {
 
         if (obj) {
             var editor = new VCrudEditor(obj, this.class_name, this);
-            editor.mount(editor_container_element);
+            editor.renderTo(editor_container_element);
         }
     }
 
@@ -61,12 +61,14 @@ class VCrudTable extends VComponent {
         }
     }
 
-    renderFilters() {
+    renderFilters()  {
+        this.filters_obj_arr = []; // в этот массив складываем объекты фильтров, чтобы потом читать их значения не из дома, а через методы объектов
+
         var filters_container_element = this.getElementByLocalId('filters_container');
         filters_container_element.innerHTML = '';
 
         var class_name = this.class_name;
-        var class_config = crud.getClassConfig(class_name);
+        var class_config = crud_main.getClassConfig(class_name);
         console.assert(class_config);
         var table_config = class_config.table;
         console.assert(table_config);
@@ -78,7 +80,8 @@ class VCrudTable extends VComponent {
         for (var filter_index in filters_config) {
             var filter_config = filters_config[filter_index];
             var filter_obj = new VCrudFilter(filter_config, this);
-            filter_obj.mountTo(filters_container_element);
+            this.filters_obj_arr.push(filter_obj);
+            filter_obj.renderTo(filters_container_element);
         }
     }
 
@@ -96,13 +99,20 @@ class VCrudTable extends VComponent {
     }
 
     makeApiRequest() {
-        var url = crud.config.api_url + this.class_name;
+        var url = crud_main.config.api_url + this.class_name;
+
+        var get_form = '1=1';
+
+        if (this.filters_obj_arr){
+            //
+        }
+
+        get_form += '&filter[limit]=10';
 
         $.ajax({
             url: url,
-            data: 'filter[limit]=10',
+            data: get_form,
             dataType: 'json',
-            cache: true,
             success: function (data) {
                 this.setObjArr(data);
             }.bind(this),

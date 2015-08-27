@@ -61,53 +61,11 @@
 
                     var obj = storage.getObject(obj_full_id);
 
-                    var page_index = 0; // вся жесть вокруг page_index изза почемуто невозможности выбрать список табов нормальным селектором и навесить онклики
-
-                    page_index = this.renderDataTabs(obj, page_index, table_polymer);
-                    page_index = this.renderLinkedModelsTabs(obj, page_index, table_polymer);
+                    this.renderDataTabs(obj, table_polymer);
 
                     // нужно, чтобы табы правильно отрисовались (какой-то баг?)
                     this.$.pages.selected = 0;
                     this.$.tabs.selected = 0;
-                },
-
-                renderDataTabs: function(obj, page_index, table_polymer){
-                    var pages = this.$.pages;
-
-                    var crud_config_for_class = crud.config[obj._class_name];
-                    for (var tab_index = 0; tab_index < crud_config_for_class.editor.length; tab_index++) {
-                        var tab_config = crud_config_for_class.editor[tab_index];
-
-                        var tab = document.createElement("paper-tab");
-                        tab.textContent = tab_config.tab_title;
-
-                        tab.onclick = function (page_index) {
-                            return function() {
-                                pages.selected = page_index;
-                                var classes_list_polymer = document.getElementsByTagName('crud-classes-list')[0];
-                                console.assert(classes_list_polymer);
-                                classes_list_polymer.crud_updateContext(table_polymer, false);
-                            }
-                        }(page_index);
-
-                        Polymer.dom(this.$.tabs).appendChild(tab);
-
-                        var page_element = document.createElement("div");
-                        Polymer.dom(this.$.pages).appendChild(page_element);
-
-                        for (var field_index = 0; field_index < tab_config.fields.length; field_index++) {
-                            var field_config = tab_config.fields[field_index];
-                            var field_component = this.createFieldEditorPolymer(obj, field_config);
-                            Polymer.dom(page_element).appendChild(field_component);
-                        }
-
-                        var buttons_polymer = document.createElement('crud-editor-save-buttons');
-                        Polymer.dom(page_element).appendChild(buttons_polymer);
-
-                        page_index++;
-                    }
-
-                    return page_index;
                 },
 
                 createFieldEditorPolymer: function(obj, field_config) {
@@ -129,46 +87,62 @@
                     return field_component;
                 },
 
-                renderLinkedModelsTabs: function (obj_instance, page_index, table_polymer) {
-                    var crud_config_for_class = crud.config[obj_instance._class_name];
+                renderDataTabs: function(obj, table_polymer){
+                    var page_index = 0;
+                    var pages = this.$.pages;
 
-                    if (crud_config_for_class.linked_models) {
-                        for (var i in crud_config_for_class.linked_models) {
-                            var linked_model_config = crud_config_for_class.linked_models[i];
-                            var linked_class_name = linked_model_config.class_name;
-                            var link_field = linked_model_config.reference_field;
+                    var crud_config_for_class = crud.config[obj._class_name];
+                    for (var tab_index = 0; tab_index < crud_config_for_class.editor.length; tab_index++) {
+                        var tab_config = crud_config_for_class.editor[tab_index];
+
+                        var tab_type = 'fields';
+                        if (tab_config.type){
+                            tab_type = tab_config.type;
+                        }
+
+                        var tab = document.createElement("paper-tab");
+                        tab.textContent = tab_config.tab_title;
+
+                        tab.onclick = function (page_index) {
+                            return function() {
+                                pages.selected = page_index;
+                                var classes_list_polymer = document.getElementsByTagName('crud-classes-list')[0];
+                                console.assert(classes_list_polymer);
+                                classes_list_polymer.crud_updateContext(table_polymer, false);
+                            }
+                        }(page_index);
+
+                        Polymer.dom(this.$.tabs).appendChild(tab);
+
+                        var page_element = document.createElement("div");
+                        Polymer.dom(this.$.pages).appendChild(page_element);
+
+                        if (tab_type == 'fields') {
+                            for (var field_index = 0; field_index < tab_config.fields.length; field_index++) {
+                                var field_config = tab_config.fields[field_index];
+                                var field_component = this.createFieldEditorPolymer(obj, field_config);
+                                Polymer.dom(page_element).appendChild(field_component);
+                            }
+
+                            var buttons_polymer = document.createElement('crud-editor-save-buttons');
+                            Polymer.dom(page_element).appendChild(buttons_polymer);
+                        }
+
+                        if (tab_type == 'linked_model') {
+                            var linked_class_name = tab_config.class_name;
+                            var link_field = tab_config.reference_field;
                             var filters_arr = [];
-                            filters_arr.push({'field_name': link_field, 'value': Model.getIdForObj(obj_instance)});
+                            filters_arr.push({'field_name': link_field, 'value': Model.getIdForObj(obj)});
 
                             var list = new CrudTable.component(linked_class_name, filters_arr);
 
-                            var div = document.createElement("div");
-                            div.appendChild(list);
-
-                            Polymer.dom(this.$.pages).appendChild(div);
-
-                            var __tab_element = document.createElement("paper-tab");
-
-                            var closure_editor_polymer = this;
-
-                            __tab_element.onclick = function (page_index) { // функция для фиксации значения page_index в замыкании
-                                return function() {
-                                    closure_editor_polymer.$.pages.selected = page_index;
-
-                                    var classes_list_polymer = document.getElementsByTagName('crud-classes-list')[0];
-                                    classes_list_polymer.crud_updateContext(table_polymer, false);
-                                }
-                            }(page_index);
-
-                            __tab_element.textContent = crud.getClassTitleByName(linked_class_name);
-                            Polymer.dom(this.$.tabs).appendChild(__tab_element);
-
-                            page_index++;
+                            Polymer.dom(page_element).appendChild(list);
                         }
-                    }
 
-                    return page_index;
+                        page_index++;
+                    }
                 }
+
             }),
 
             /*

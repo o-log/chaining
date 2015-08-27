@@ -26,6 +26,9 @@ app.get('/', function(req, res){
 app.get('/ng.html', function(req, res){
     res.sendFile(__dirname + '/ng.html');
 });
+app.get('/pagejs.html', function(req, res){
+    res.sendFile(__dirname + '/pagejs.html');
+});
 app.get('/react.html', function(req, res){
     res.sendFile(__dirname + '/react.html');
 });

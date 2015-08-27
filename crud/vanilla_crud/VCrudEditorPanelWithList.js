@@ -11,7 +11,7 @@ class VCrudEditorPanelWithList extends VComponent {
         return this.localElementId("panel");
     }
 
-    mountTo(panels_container, tabs_container) {
+    renderTo(panels_container, tabs_container) {
         var linked_class_name = this.linked_model_config.class_name;
         var link_field = this.linked_model_config.reference_field;
         var filters_arr = [];

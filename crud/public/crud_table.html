@@ -49,6 +49,7 @@
 
         #controls.visible {
             display: block;
+            background-color: white;
         }
 
         #toggle_filters {
@@ -123,8 +124,8 @@
                 },
 
                 onFilterUpdate: function() {
-                    var classes_list_polymer =  document.getElementsByTagName('crud-classes-list')[0];
-                    classes_list_polymer.crud_updateContext(this, false);
+                    var crud_main_polymer =  document.querySelector('crud-main');
+                    crud_main_polymer.crud_updateContext(this, false);
                     this.apiQuery();
                 },
 
@@ -224,7 +225,7 @@
                         url: query_url, success: function (data) {
                             setTimeout(function(){
                                 CrudTable.tableSuccess(data, table_component); // do not pass THIS - may be missing
-                            }, 1000);
+                            }, 0); // здесь можно поставить искуственную задержку для тестирования работы на медленном интернете
                         }
                     });
                 },
@@ -238,11 +239,11 @@
                     this.crud_active_editor = editor_polymer;
                     this.crud_replaceChildren(editor_polymer);
 
-                    var classes_list_polymer =  document.getElementsByTagName('crud-classes-list')[0];
-                    console.assert(classes_list_polymer);
+                    var crud_main_polymer =  document.querySelector('crud-main');
+                    console.assert(crud_main_polymer);
 
-                    classes_list_polymer.crud_replaceChildren(this);
-                    classes_list_polymer.crud_updateContext(this, append_context);
+                    crud_main_polymer.crud_replaceChildren(this);
+                    crud_main_polymer.crud_updateContext(this, append_context);
                 },
 
                 crud_getContextHash: function(){
@@ -271,6 +272,9 @@
                         var obj_name = Model.getTitleForObj(obj);
                         str += ': ' + obj_name;
                     }
+
+                    // пока для отладки
+                    str = JSON.stringify(this.crud_getContextHash());
 
                     return str;
                 }

@@ -32,6 +32,10 @@
 
                 var field_value = obj[field_name];
 
+                if (!field_value) {
+                    field_value = 'NO_VALUE'
+                }
+
                 // default, may be overwritten later
                 this.$.cell.textContent = field_value;
 
@@ -40,40 +44,12 @@
                         this.$.cell.textContent = '';
 
                         var a_element = document.createElement('a');
-                        a_element.dataset.crud_obj_full_id = full_obj_id;
+                        //a_element.dataset.crud_obj_full_id = full_obj_id;
                         //a_element.onclick = crud.crudObjectInListOnClick;
 
-                        a_element.onclick = function () {
-                            var obj_full_id = $(this).data('crud_obj_full_id');
-
-                            //var table_element = crud_table_component;
-
-                            /*
-                            var rows = $(table_element).find('crud-table-row');
-                            $(rows).removeClass('active');
-                            */
-
-                            table_row_polymer.setActive(table_polymer);
-
-                            var editor_component = new crudEditor.component(obj_full_id, table_polymer);
-                            table_polymer.crud_setActiveEditor(editor_component);
-
-                            /*
-                            Polymer.dom(classes_list_polymer.$.children_container).innerHTML = '';
-                            Polymer.dom(classes_list_polymer.$.children_container).appendChild(crud_table_component);
-                            */
-
-                            //classes_list_polymer.crud_addContext('editor: ' + obj_full_id);
-
-                            return false;
-                        };
-
-
+                        a_element.onclick = this.onCellClick.bind(this, full_obj_id, table_row_polymer, table_polymer);
                         a_element.href = "#";
 
-                        if (!field_value) {
-                            field_value = 'NO_VALUE'
-                        }
                         a_element.textContent = field_value;
 
                         this.$.cell.appendChild(a_element);
@@ -81,9 +57,31 @@
                 }
             },
 
-            ready: function () {
-                //console.log('ready');
-            }
+                onCellClick: function (obj_full_id, table_row_polymer, table_polymer) {
+                    //var obj_full_id = $(this).data('crud_obj_full_id');
+
+                    //var table_element = crud_table_component;
+
+                    /*
+                     var rows = $(table_element).find('crud-table-row');
+                     $(rows).removeClass('active');
+                     */
+
+                    table_row_polymer.setActive(table_polymer);
+
+                    var editor_component = new crudEditor.component(obj_full_id, table_polymer);
+                    table_polymer.crud_setActiveEditor(editor_component);
+
+                    /*
+                     Polymer.dom(classes_list_polymer.$.children_container).innerHTML = '';
+                     Polymer.dom(classes_list_polymer.$.children_container).appendChild(crud_table_component);
+                     */
+
+                    //classes_list_polymer.crud_addContext('editor: ' + obj_full_id);
+
+                    return false;
+                }
+
         });
     </script>
 

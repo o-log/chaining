@@ -6,7 +6,7 @@ var CrudClassesList = React.createClass({
     render: function () {
         var res = [];
 
-        for (var class_name in crud.config){
+        for (var class_name in crud_main.config){
             res.push(<CrudClass class_name={class_name} table_react={this.props.table_react}/>);
         }
 

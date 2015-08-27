@@ -8,8 +8,8 @@ class VCrudEditor extends VComponent {
         this.table_obj = table_obj;
     }
 
-    mount(container_element) {
-        var class_config = crud.getClassConfig(this.class_name);
+    renderTo(container_element) {
+        var class_config = crud_main.getClassConfig(this.class_name);
         console.assert(class_config);
         console.assert(class_config.editor);
 
@@ -34,7 +34,7 @@ class VCrudEditor extends VComponent {
             for (var linked_model_index in class_config.linked_models) {
                 var linked_model_config = class_config.linked_models[linked_model_index];
                 var linked_models_list = new VCrudEditorPanelWithList(linked_model_config);
-                linked_models_list.mountTo(panels_container, tabs_container);
+                linked_models_list.renderTo(panels_container, tabs_container);
             }
         }
 

@@ -1,6 +1,5 @@
 var crud = {
         config: {
-            api_url: 'http://localhost:3001/',
             auth: {
                 title: 'пользователи',
                 id_field_name: 'auth_id',
@@ -34,10 +33,6 @@ var crud = {
                             {field_name: 'auth_email', widget: {name: 'input'}}
                         ]
                     }
-                ],
-                linked_models: [
-                    {class_name: 'poll', reference_field: 'node_id'},
-                    {class_name: 'game_media', reference_field: 'nid'}
                 ]
             },
             node: {
@@ -56,6 +51,9 @@ var crud = {
                         }
                     ],
                     columns: [
+                        {
+                            field_name: 'nid', widget: {name: 'text', params: {edit_link: true}}
+                        },
                         {
                             field_name: 'title', widget: {name: 'text', params: {edit_link: true}}
                         },
@@ -77,11 +75,9 @@ var crud = {
                     {
                         tab_title: 'контент',
                         fields: []
-                    }
-                ],
-                linked_models: [
-                    {class_name: 'poll', reference_field: 'node_id'},
-                    {class_name: 'game_media', reference_field: 'nid'}
+                    },
+                    {tab_title: 'опросы', type: 'linked_model', class_name: 'poll', reference_field: 'node_id'},
+                    {tab_title: 'матчи', type: 'linked_model', class_name: 'game_media', reference_field: 'nid'}
                 ]
             },
             keyvalue2_items: {
@@ -107,18 +103,21 @@ var crud = {
                 },
                 editor: [
                     {
+                        tab_title: 'items',
+                        type: 'linked_model',
+                        class_name: 'keyvalue2_items',
+                        reference_field: 'parent_id'
+                    },
+                    {
                         tab_title: 'поля',
                         fields: [
                             {field_name: 'name', widget: {name: 'input'}},
                             {field_name: 'fullname', widget: {name: 'input'}},
+                            {field_name: 'weight', widget: {name: 'input'}},
                             {field_name: 'value', widget: {name: 'textarea'}},
-                            {field_name: 'description', widget: {name: 'textarea'}},
-                            {field_name: 'weight', widget: {name: 'input'}}
+                            {field_name: 'description', widget: {name: 'textarea'}}
                         ]
                     }
-                ],
-                linked_models: [
-                    {class_name: 'keyvalue2_items', reference_field: 'parent_id'}
                 ]
             },
             game_media: {
@@ -164,6 +163,7 @@ var crud = {
                     ]
                 },
                 editor: [
+                    {tab_title: 'ответы', type: 'linked_model', class_name: 'poll_answer', reference_field: 'poll_id'},
                     {
                         tab_title: 'поля',
                         fields: [
@@ -173,9 +173,6 @@ var crud = {
                             {field_name: 'created_at', widget: {name: 'input'}}
                         ]
                     }
-                ],
-                linked_models: [
-                    {class_name: 'poll_answer', reference_field: 'poll_id'}
                 ]
             },
             poll_answer: {
@@ -183,9 +180,7 @@ var crud = {
                 title_field_name: 'answer_text',
                 table: {
                     search_fields: [
-                        {
-                            field_name: 'poll_id'
-                        }
+                        {field_name: 'poll_id'}
                     ],
                     columns: [
                         {
@@ -212,15 +207,9 @@ var crud = {
                 title: 'блоки',
                 table: {
                     search_fields: [
-                        {
-                            field_name: 'id'
-                        },
-                        {
-                            field_name: 'info'
-                        },
-                        {
-                            field_name: 'region'
-                        }
+                        {field_name: 'id'},
+                        {field_name: 'info'},
+                        {field_name: 'region'}
                     ],
                     columns: [
                         {
@@ -404,7 +393,8 @@ var crud = {
                         widget: {name: 'input'}
                     }
                 ]
-            }
+            },
+            api_url: 'http://localhost:3001/'
         },
 
         getClassConfig: function (class_name) {

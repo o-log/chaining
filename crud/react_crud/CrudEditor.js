@@ -19,7 +19,7 @@ var CrudEditor = React.createClass({
             );
         }
 
-        var class_config = crud.getClassConfig(this.props.table_react.state.class_name); // todo: use getter in table
+        var class_config = crud_main.getClassConfig(this.props.table_react.state.class_name); // todo: use getter in table
         console.assert(class_config);
         console.assert(class_config.editor);
         //console.assert(class_config.editor.tabs);

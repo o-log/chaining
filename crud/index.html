@@ -36,9 +36,10 @@
     window.Polymer.dom = 'shadow'; // oLog: "shady" implementation (default) is waaay faster (2x)
 </script>
 
-<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
 <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
 <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+
+<script src="bower_components/el.js/el.js"></script>
 
 <script src="public/crud.js"></script>
 <script src="public/socket.js"></script>
@@ -63,8 +64,8 @@
 <link rel="import" href="public/crud_table.html">
 <link rel="import" href="public/crud_table_filter.html">
 <link rel="import" href="public/crud_table_order.html">
+<link rel="import" href="public/crud_main.html">
 <link rel="import" href="public/crud_classes_list.html">
-<link rel="import" href="public/crud_classes_list_row.html">
 <link rel="import" href="public/crud_editor.html">
 <link rel="import" href="public/crud_table_cell_text.html">
 <link rel="import" href="public/crud_table_cell_timestamp.html">
@@ -78,16 +79,18 @@
 <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
     <header class="mdl-layout__header">
         <div class="mdl-layout__header-row">
-            <span class="mdl-layout-title">CRUD 2015</span>
+            <span class="mdl-layout-title">CRUD 2015 (polymer)</span>
         </div>
     </header>
     <div class="mdl-layout__drawer">
-        <span class="mdl-layout-title">Drawer</span>
-        <nav class="mdl-navigation">
+        <span class="mdl-layout-title">Модели</span>
+        <nav class="mdl-navigation" id="navigation">
+            <crud-classes-list/>
         </nav>
     </div>
     <main class="mdl-layout__content">
         <div id="page-content">
+            <crud-main/>
         </div>
     </main>
 </div>
@@ -95,41 +98,9 @@
 
 <script>
 
-    var classes_list_component = new crudClassesList.component();
-    document.querySelector('#page-content').appendChild(classes_list_component);
-
-    initClassesList(classes_list_component);
-
     var hash = window.location.hash;
-    if (hash){
+    if (hash) {
         //classes_list_component.crud_updateFromHash(); // сейчас не заработает, потому что перед показом редактора для объекта модель должна быть загружена в хранилище. т.е. активировать редактор можно только после ответа от апи на запрос таблицы с фильтрами
-    }
-
-    function initClassesList(classes_list_component){
-        for (var class_name in crud.config) {
-            //var row_component = new CrudClassesListRow.component(class_name, classes_list_component);
-            //<a class="mdl-navigation__link" id="edit_link" href="#"></a>
-            var a = document.createElement('a');
-            a.classList.add('mdl-navigation__link');
-            var class_title = crud.getClassTitleByName(class_name);
-            a.textContent = class_title;
-            a.dataset.crud_class_name = class_name;
-
-            a.onclick = function(){
-                var class_name = this.dataset.crud_class_name;
-                var table_polymer = new CrudTable.component(class_name);
-
-                classes_list_component.crud_replaceChildren(table_polymer);
-
-                classes_list_component.crud_clearContexts();
-                classes_list_component.crud_updateContext(table_polymer, true);
-
-                return true;
-            };
-
-            document.querySelector('.mdl-navigation').appendChild(a);
-        }
-
     }
 
 </script>
