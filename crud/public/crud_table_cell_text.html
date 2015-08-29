@@ -44,8 +44,6 @@
                         this.$.cell.textContent = '';
 
                         var a_element = document.createElement('a');
-                        //a_element.dataset.crud_obj_full_id = full_obj_id;
-                        //a_element.onclick = crud.crudObjectInListOnClick;
 
                         a_element.onclick = this.onCellClick.bind(this, full_obj_id, table_row_polymer, table_polymer);
                         a_element.href = "#";
@@ -57,30 +55,23 @@
                 }
             },
 
-                onCellClick: function (obj_full_id, table_row_polymer, table_polymer) {
-                    //var obj_full_id = $(this).data('crud_obj_full_id');
+            onCellClick: function (obj_full_id, table_row_polymer, table_polymer) {
+                table_row_polymer.setActive(table_polymer);
 
-                    //var table_element = crud_table_component;
+                var editor_component = new crudEditor.component(obj_full_id, table_polymer);
+                table_polymer.crud_setActiveEditor(editor_component);
 
-                    /*
-                     var rows = $(table_element).find('crud-table-row');
-                     $(rows).removeClass('active');
-                     */
+                var crud_main_polymer =  document.querySelector('crud-main');
+                console.assert(crud_main_polymer);
 
-                    table_row_polymer.setActive(table_polymer);
-
-                    var editor_component = new crudEditor.component(obj_full_id, table_polymer);
-                    table_polymer.crud_setActiveEditor(editor_component);
-
-                    /*
-                     Polymer.dom(classes_list_polymer.$.children_container).innerHTML = '';
-                     Polymer.dom(classes_list_polymer.$.children_container).appendChild(crud_table_component);
-                     */
-
-                    //classes_list_polymer.crud_addContext('editor: ' + obj_full_id);
-
-                    return false;
+                if (crud_main_polymer.crud_active_table_polymer != table_polymer) {
+                    crud_main_polymer.crud_setActiveTable(table_polymer, true);
+                } else {
+                    crud_main_polymer.crud_updateLastContext(table_polymer);
                 }
+
+                return false;
+            }
 
         });
     </script>

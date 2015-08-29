@@ -8,7 +8,7 @@
         }
 
         body {
-            background-color: #f9f9f9;
+            background-color: #e8e8e8;
         }
 
         #page-content{
@@ -53,6 +53,7 @@
 <link rel="import" href="bower_components/paper-drawer-panel/paper-drawer-panel.html">
 <link rel="import" href="bower_components/paper-styles/paper-styles.html">
 <link rel="import" href="bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="bower_components/paper-material/paper-material.html">
 <link rel="import" href="bower_components/paper-checkbox/paper-checkbox.html">
@@ -100,7 +101,8 @@
 
     var hash = window.location.hash;
     if (hash) {
-        //classes_list_component.crud_updateFromHash(); // сейчас не заработает, потому что перед показом редактора для объекта модель должна быть загружена в хранилище. т.е. активировать редактор можно только после ответа от апи на запрос таблицы с фильтрами
+        var crud_main_element = document.querySelector('crud-main');
+        crud_main_element.crud_updateFromHash();
     }
 
 </script>

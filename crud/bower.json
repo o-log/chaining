@@ -16,6 +16,7 @@
   ],
   "dependencies": {
     "el.js": "*",
+    "iron-ajax": "PolymerElements/iron-ajax#~1.0.4",
     "iron-pages": "PolymerElements/iron-pages",
     "ng-admin": "~0.7.0",
     "page": "visionmedia/page.js#~1.6.3",

@@ -200,9 +200,7 @@ var crud = {
                         ]
                     }
                 ]
-            }
-            ,
-
+            },
             blocks: {
                 title: 'блоки',
                 table: {

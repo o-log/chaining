@@ -38,6 +38,7 @@
                 is: "crud-editor",
 
                 obj_full_id: '',
+                table_polymer: null,
 
                 crud_getContextHash: function () {
                     var hash = {};
@@ -58,9 +59,13 @@
 
                 factoryImpl: function (obj_full_id, table_polymer) {
                     this.obj_full_id = obj_full_id;
+                    this.table_polymer = table_polymer;
 
-                    var obj = storage.getObject(obj_full_id);
+                    storage.getObjectDeferred(obj_full_id, this.onObjectLoaded.bind(this))
+                },
 
+                onObjectLoaded: function(obj){
+                    var table_polymer = this.table_polymer;
                     this.renderDataTabs(obj, table_polymer);
 
                     // нужно, чтобы табы правильно отрисовались (какой-то баг?)
@@ -87,10 +92,17 @@
                     return field_component;
                 },
 
-                renderDataTabs: function(obj, table_polymer){
-                    var page_index = 0;
+                tab_onClick: function(tab_index, table_polymer) {
                     var pages = this.$.pages;
 
+                    pages.selected = tab_index;
+
+                    var crud_main = document.querySelector('crud-main');
+                    console.assert(crud_main);
+                    crud_main.crud_updateLastContext(table_polymer);
+                },
+
+                renderDataTabs: function(obj, table_polymer){
                     var crud_config_for_class = crud.config[obj._class_name];
                     for (var tab_index = 0; tab_index < crud_config_for_class.editor.length; tab_index++) {
                         var tab_config = crud_config_for_class.editor[tab_index];
@@ -102,15 +114,7 @@
 
                         var tab = document.createElement("paper-tab");
                         tab.textContent = tab_config.tab_title;
-
-                        tab.onclick = function (page_index) {
-                            return function() {
-                                pages.selected = page_index;
-                                var classes_list_polymer = document.getElementsByTagName('crud-classes-list')[0];
-                                console.assert(classes_list_polymer);
-                                classes_list_polymer.crud_updateContext(table_polymer, false);
-                            }
-                        }(page_index);
+                        tab.onclick = this.tab_onClick.bind(this, tab_index, table_polymer);
 
                         Polymer.dom(this.$.tabs).appendChild(tab);
 
@@ -138,8 +142,6 @@
 
                             Polymer.dom(page_element).appendChild(list);
                         }
-
-                        page_index++;
                     }
                 }
 

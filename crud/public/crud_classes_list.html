@@ -22,15 +22,9 @@
             },
 
             classOnClick: function (class_name) {
-                var crud_main_polymer = document.querySelector('crud-main');
+                var crud_main_polymer = document.querySelector('crud-main'); // TODO: передавать списку классов в параметрах, каким крудом тот управляет? чтобы можно было использовать на странице несколько крудов
 
-                var table_polymer = new CrudTable.component(class_name);
-                crud_main_polymer.crud_replaceChildren(table_polymer);
-
-                crud_main_polymer.crud_clearContexts();
-                crud_main_polymer.crud_updateContext(table_polymer, true);
-
-                return true;
+                crud_main_polymer.crud_openClass(class_name);
             }
 
         });

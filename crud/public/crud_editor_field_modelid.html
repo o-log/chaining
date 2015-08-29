@@ -55,13 +55,12 @@
             is: "crud-editor-field-modelid",
             field_name: '',
             params: {},
+            obj_full_id: null,
 
-            factoryImpl: function(obj_full_id, field_name, widget_params) {
-                this.field_name = field_name;
-                this.params = widget_params;
-
-                var obj = storage._obj_arr[obj_full_id];
+            onSelfObjLoad: function(obj) {
+                var field_name = this.field_name;
                 var field_value = obj[field_name];
+                var widget_params = this.params;
 
                 this.$.input.value = field_value;
 
@@ -75,24 +74,24 @@
                 this.$.label.textContent = title;
                 this.$.input.name = field_name;
 
-                var api_url = 'localhost:3001';
 
-                var field_polymer = this;
-                var class_name = widget_params.class_name;
+                var linked_full_obj_id = widget_params.class_name + '::' + field_value;
 
-                var query_url = 'http://' + api_url + '/' + class_name + '/' + field_value;
+                storage.getObjectDeferred(linked_full_obj_id, this.onLinkedObjLoad.bind(this));
+            },
 
-                $.ajax({
-                    url: query_url, success: function (data) {
-                        obj._class_name = class_name;
+            onLinkedObjLoad: function(obj) {
+                Polymer.dom(this.$.link).textContent = Model.getTitleForObj(obj);
+            },
 
-                        var obj_full_id = Model.getFullIdForObj(obj);
-                        storage.setObject(obj_full_id, obj);
+            factoryImpl: function(obj_full_id, field_name, widget_params) {
+                this.field_name = field_name;
+                this.params = widget_params;
+                this.obj_full_id = obj_full_id;
 
-                        Polymer.dom(field_polymer.$.link).textContent = Model.getTitleForObj(obj);
-                    }
-                });
+                // TODO: переместить загрузку и вывод в ready()?
 
+                storage.getObjectDeferred(obj_full_id, this.onSelfObjLoad.bind(this));
             },
 
             linkClick: function() {
@@ -100,12 +99,28 @@
                 var widget_params = this.params;
 
                 var reference_class_name = widget_params.class_name;
-                var hash = {class_name: reference_class_name};
+                var hash = {
+                    type: 'crud-table',
+                    class_name: reference_class_name,
+                    str: 'not_generated_yet',
+                    filters: []
+                };
+
+                var contexts_arr = [hash];
+
+                var crud_main_polymer = document.querySelector('crud-main');
+                console.assert(crud_main_polymer);
+                crud_main_polymer.crud_setLocationHashFromContextsArr(contexts_arr);
+                crud_main_polymer.crud_updateFromHash();
+
+                /*
                 var hash_str = JSON.stringify(hash);
+
 
                 window.location.hash = hash_str;
                 var classes_list_polymer =  document.getElementsByTagName('crud-classes-list')[0];
                 classes_list_polymer.crud_updateFromHash();
+                */
 
             },
 

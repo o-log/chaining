@@ -3,90 +3,91 @@
 <dom-module id="crud-table">
 
     <!-- scoped CSS for this element -->
-    <style>
-        :host {
-            display: table;
-            width: 100%;
-            /*background-color: white;*/
-        }
-
-        #title {
-            font-weight: bold;
-        }
-
-        #table_container {
-            display: table-cell;
-            vertical-align: top;
-            /*padding: 10px;*/
-            width: 100%;
-            /*background-color: white;*/
-        }
-
-        #table_container.narrow {
-            width: 30%;
-            /*background-color: #f9f9f9;*/
-        }
-
-        #children_container {
-            vertical-align: top;
-            /*padding: 20px;*/
-            display: none;
-        }
-
-        #children_container.wide {
-            /*background-color: #f9f9f9;*/
-            display: table-cell;
-        }
-
-        #header {
-            /*border-bottom: 1px solid #ccc;*/
-        }
-
-        #controls {
-            padding: 0 20px 20px 20px;
-            display: none;
-        }
-
-        #controls.visible {
-            display: block;
-            background-color: white;
-        }
-
-        #toggle_filters {
-            cursor: pointer;
-            /*font-size: 10px;*/
-            display: table-cell;
-            text-align: right;
-            vertical-align: middle;
-            padding-right: 20px;
-        }
-
-        #toggle_filters_container {
-            background-color: #2196F3;
-            height: 48px; /* same with paper-tabs */
-        }
-
-        #spinner_container {
-            padding-left: 20px;
-            vertical-align: middle;
-            display: table-cell;
-        }
-
-        #add_remove.hidden {
-            display: none;
-        }
-
-        #add_remove {
-            vertical-align: middle;
-            padding-left: 20px;
-            display: table-cell;
-            /*padding: 20px;*/
-            color: #01579B;
-            font-family: Roboto;
-        }
-    </style>
 
     <template>
+        <style>
+            :host {
+                display: table;
+                width: 100%;
+                /*background-color: white;*/
+            }
+
+            #title {
+                font-weight: bold;
+            }
+
+            #table_container {
+                display: table-cell;
+                vertical-align: top;
+                /*padding: 10px;*/
+                width: 100%;
+                /*background-color: white;*/
+            }
+
+            #table_container.narrow {
+                width: 30%;
+                /*background-color: #f9f9f9;*/
+            }
+
+            #children_container {
+                vertical-align: top;
+                /*padding: 20px;*/
+                display: none;
+            }
+
+            #children_container.wide {
+                /*background-color: #f9f9f9;*/
+                display: table-cell;
+            }
+
+            #header {
+                /*border-bottom: 1px solid #ccc;*/
+            }
+
+            #controls {
+                padding: 0 20px 20px 20px;
+                display: none;
+            }
+
+            #controls.visible {
+                display: block;
+                background-color: white;
+            }
+
+            #toggle_filters {
+                cursor: pointer;
+                /*font-size: 10px;*/
+                display: table-cell;
+                text-align: right;
+                vertical-align: middle;
+                padding-right: 20px;
+            }
+
+            #toggle_filters_container {
+                background-color: #2196F3;
+                height: 48px; /* same with paper-tabs */
+            }
+
+            #spinner_container {
+                padding-left: 20px;
+                vertical-align: middle;
+                display: table-cell;
+            }
+
+            #add_remove.hidden {
+                display: none;
+            }
+
+            #add_remove {
+                vertical-align: middle;
+                padding-left: 20px;
+                display: table-cell;
+                /*padding: 20px;*/
+                color: #01579B;
+                font-family: Roboto;
+            }
+        </style>
+
         <div style="display: table-row;">
             <div id="table_container">
                 <!--<paper-material elevation="1" style="min-height: 1500px;">-->
@@ -118,6 +119,8 @@
         var CrudTable = {
             component: Polymer({
                 is: "crud-table",
+                crud_active_editor: null,
+                //afterTableLoad: null,
 
                 crud_toggleFilters: function () {
                     Polymer.dom(this.$.controls).classList.toggle('visible');
@@ -125,7 +128,7 @@
 
                 onFilterUpdate: function() {
                     var crud_main_polymer =  document.querySelector('crud-main');
-                    crud_main_polymer.crud_updateContext(this, false);
+                    crud_main_polymer.crud_updateLastContext(this);
                     this.apiQuery();
                 },
 
@@ -142,7 +145,7 @@
                 factoryImpl: function (class_name, filters_arr, orders_arr) {
                     this.crud_class_name = class_name;
 
-                    this.$.filters.dataset.class_name = class_name;
+                    //this.$.filters.dataset.class_name = class_name;
                     //this.$.title.textContent = crud.getClassTitleByName(class_name);
 
                     CrudTable.renderFilters(class_name, this, filters_arr);
@@ -219,37 +222,49 @@
                     query_url = this.appendWhereFilters(query_url);
                     query_url = CrudTable.appendOrderFIlters(this, query_url);
 
-                    var table_component = this;
-
                     $.ajax({
-                        url: query_url, success: function (data) {
-                            setTimeout(function(){
-                                CrudTable.tableSuccess(data, table_component); // do not pass THIS - may be missing
-                            }, 0); // здесь можно поставить искуственную задержку для тестирования работы на медленном интернете
-                        }
+                        url: query_url,
+                        success: this.handleResponse.bind(this)
                     });
                 },
 
-                crud_setActiveEditor: function(editor_polymer){
-                    var append_context = true;
-                    if (this.crud_active_editor){
-                        append_context = false;
+                handleResponse: function(data){
+                    this.$.spinner.active = false;
+                    this.$.add_remove.classList.remove('hidden');
+
+                    for (var i in data) {
+                        var obj = data[i];
+                        this.addObject(obj);
                     }
 
+                    /*
+                    if (typeof(this.afterTableLoad) === 'function'){
+                        this.afterTableLoad();
+                    }
+                    */
+                },
+
+                addObject: function (obj) {
+                    Model.setClassNameForObj(obj, this.crud_class_name);
+
+                    var obj_full_id = Model.getFullIdForObj(obj);
+                    storage.setObject(obj_full_id, obj);
+
+                    var new_block_component = new CrudTableRow(obj_full_id, this);
+                    Polymer.dom(this.$.list_container).appendChild(new_block_component); // appends to <content>
+                },
+
+
+                crud_setActiveEditor: function(editor_polymer){
                     this.crud_active_editor = editor_polymer;
                     this.crud_replaceChildren(editor_polymer);
-
-                    var crud_main_polymer =  document.querySelector('crud-main');
-                    console.assert(crud_main_polymer);
-
-                    crud_main_polymer.crud_replaceChildren(this);
-                    crud_main_polymer.crud_updateContext(this, append_context);
                 },
 
                 crud_getContextHash: function(){
                     var hash = {
                         type: 'crud-table',
-                        class_name: this.crud_class_name
+                        class_name: this.crud_class_name,
+                        str: this.crud_getContextStr()
                     };
 
                     hash.filters = this.getFiltersValues();
@@ -273,9 +288,6 @@
                         str += ': ' + obj_name;
                     }
 
-                    // пока для отладки
-                    str = JSON.stringify(this.crud_getContextHash());
-
                     return str;
                 }
             }),
@@ -294,37 +306,6 @@
                 }
 
                 return query_url;
-            },
-
-            tableSuccess: function (data, table_component) {
-                table_component.$.spinner.active = false;
-                table_component.$.add_remove.classList.remove('hidden');
-                //var class_name = CrudTable.getClassNameForTableComponent(table_component);
-                //table_component.$.title.textContent = crud.getClassTitleByName(class_name) + ' (' + data.length + ')';
-
-                for (var i in data) {
-                    var obj = data[i];
-                    CrudTable.addObject(obj, table_component);
-                }
-            },
-
-            addObject: function (obj, table_component) {
-                var class_name = table_component.$.filters.dataset.class_name;
-                obj._class_name = class_name;
-
-                var obj_full_id = Model.getFullIdForObj(obj);
-                storage.setObject(obj_full_id, obj);
-
-                var new_block_component = new CrudTableRow(obj_full_id, table_component);
-                Polymer.dom(table_component.$.list_container).appendChild(new_block_component); // appends to <content>
-            },
-
-            getTableForInnerElement: function (element) {
-                return $(element).parents('crud-table')[0];
-            },
-
-            getClassNameForTableComponent: function (table_component) {
-                return table_component.$.filters.dataset.class_name;
             },
 
             renderFilters: function (class_name, self_component, filters_arr) {
