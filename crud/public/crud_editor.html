@@ -17,14 +17,21 @@
         }
 
         paper-tabs {
-            background-color: #2196F3;
+            background-color: #009688;
         }
 
     </style>
 
     <template>
-        <paper-tabs id="tabs" selected="0">
-        </paper-tabs>
+        <div style="display: table; width: 100%;">
+            <div style="display: table-row;">
+            <div style="display: table-cell;">
+            <paper-tabs id="tabs" selected="0">
+            </paper-tabs>
+            </div>
+                <div style="display: table-cell; width: 40px; text-align: center; vertical-align: middle;"  on-click="crud_closeEditor">X</div>
+        </div>
+            </div>
         <paper-material>
             <iron-pages id="pages" selected="0">
             </iron-pages>
@@ -39,6 +46,10 @@
 
                 obj_full_id: '',
                 table_polymer: null,
+
+                crud_closeEditor: function() {
+                    this.table_polymer.crud_closeEditor();
+                },
 
                 crud_getContextHash: function () {
                     var hash = {};
@@ -103,7 +114,7 @@
                 },
 
                 renderDataTabs: function(obj, table_polymer){
-                    var crud_config_for_class = crud.config[obj._class_name];
+                    var crud_config_for_class = crud.getClassConfig(obj._class_name);
                     for (var tab_index = 0; tab_index < crud_config_for_class.editor.length; tab_index++) {
                         var tab_config = crud_config_for_class.editor[tab_index];
 
@@ -138,7 +149,7 @@
                             var filters_arr = [];
                             filters_arr.push({'field_name': link_field, 'value': Model.getIdForObj(obj)});
 
-                            var list = new CrudTable.component(linked_class_name, filters_arr);
+                            var list = new CrudTable(linked_class_name, filters_arr);
 
                             Polymer.dom(page_element).appendChild(list);
                         }
@@ -152,7 +163,7 @@
                 var obj_full_id = this.obj_full_id;
                 var obj = storage.getObject(obj_full_id);
 
-                var crud_config_for_class = crud.config[obj._class_name];
+                var crud_config_for_class = crud.getClassConfig[obj._class_name];
                 for (var i = 0; i < crud_config_for_class.editor.length; i++) {
                     var field_config = crud_config_for_class.editor[i];
                     var property_name = field_config.field_name;

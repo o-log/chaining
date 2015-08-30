@@ -8,43 +8,36 @@
 
     <template>
         <div>
-            <span id="field_name"></span> <paper-checkbox id="input"></paper-checkbox>
-            <!--<paper-toggle-button id="direction"></paper-toggle-button>-->
-            <!--<paper-input id="input"></paper-input>-->
+            <span id="field_name"></span>
         </div>
     </template>
 
     <script>
-        var CrudTableOrder = {
+        var CrudTableOrder = Polymer({
+            is: "crud-table-order",
 
-            component: Polymer({
-                is: "crud-table-order",
+            properties: {
+                crud_class_name: String,
+                crud_field_name: String,
+                order_direction: String
+            },
 
-                properties: {
-                    crud_class_name: String,
-                    crud_field_name: String,
-                    crud_field_value: String
-                },
+            factoryImpl: function (table_component, class_name, search_field_name, order_direction) {
+                 this.$.field_name.textContent = 'order by: ' + search_field_name + ' ' + order_direction;
 
-                factoryImpl: function (table_component, class_name, search_field_name, value) {
-                    /* TODO: rewrite
-                    //this.$.input.textContent = search_field_name;
-                    this.$.field_name.textContent = 'order by ' + search_field_name;
+                 this.crud_field_name = search_field_name;
+                 this.order_direction = order_direction;
 
-                    this.crud_field_name = search_field_name;
-                    this.crud_field_value = value;
+                /*
+                 var filter_polymer = this;
 
-                    var filter_polymer = this;
-
-                    this.$.input.addEventListener('iron-change', function () {
-                        filter_polymer.crud_field_value = this.value;
-
-                        table_component.apiQuery(class_name, 0);
-                    });
-                    */
-                }
-            })
-        };
+                 this.$.input.addEventListener('iron-change', function () {
+                     filter_polymer.crud_field_value = this.value;
+                     table_component.onFilterUpdate();
+                 });
+                 */
+            }
+        });
     </script>
 
 </dom-module>

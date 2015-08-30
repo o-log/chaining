@@ -1,0 +1,82 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<dom-module id="crud-table-filter-model-select">
+
+    <!-- scoped CSS for this element -->
+    <style>
+    </style>
+
+    <template>
+        <div>
+            <span id="title"></span> <select id="select"></select>
+        </div>
+    </template>
+
+    <script>
+        var CrudTableFilterModelSelect = Polymer({
+            is: "crud-table-filter-model-select",
+
+            widget_config: null,
+            table_component: null,
+
+            properties: {
+                crud_class_name: String,
+                crud_field_name: String,
+                crud_field_value: String
+            },
+
+            factoryImpl: function (table_component, class_name, search_field_name, value, widget_config) {
+                console.assert(widget_config.class_name);
+
+                this.$.title.textContent = widget_config.class_name;
+
+                this.crud_class_name = class_name;
+                this.crud_field_name = search_field_name;
+                this.crud_field_value = value;
+                this.widget_config = widget_config;
+                this.table_component = table_component;
+
+                var api_url = crud.config.api_url;
+
+                var query_url = api_url + '/' + widget_config.class_name;
+                query_url += '?1=1';
+
+                var limit = 100; // пока защитный лимит
+                query_url += '&filter[limit]=' + limit;
+
+                if (widget_config.order_field_name) {
+                    query_url += '&filter[order][0]=' + widget_config.order_field_name;
+                }
+
+                $.ajax({
+                    url: query_url,
+                    success: this.handleResponse.bind(this)
+                });
+
+                this.$.select.onchange = this.onChange.bind(this);
+            },
+
+            onChange: function (event){
+                var value = event.target.value;
+                this.crud_field_value = value;
+                this.table_component.onFilterUpdate();
+            },
+
+            handleResponse: function (data) {
+                var id_field_name = this.widget_config.id_field_name;
+                var name_field_name = this.widget_config.name_field_name;
+
+                for (var index in data){
+                    var obj = data[index];
+
+                    var option = el('option', {value: obj[id_field_name]}, obj[name_field_name]);
+
+                    Polymer.dom(this.$.select).appendChild(option);
+                }
+
+                this.$.select.value = this.crud_field_value;
+            }
+        });
+    </script>
+
+</dom-module>

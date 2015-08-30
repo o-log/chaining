@@ -25,7 +25,7 @@ var Model = {
     getIdFieldNameForClass: function(class_name){
         var id_field_name = 'id';
 
-        var class_config = crud.config[class_name];
+        var class_config = crud.getClassConfig(class_name);
         if (class_config){
             if (class_config.id_field_name){
                 id_field_name = class_config.id_field_name;
@@ -48,7 +48,7 @@ var Model = {
     getTitleForObj: function(obj){
         var class_name = obj._class_name;
 
-        var class_config = crud.config[class_name];
+        var class_config = crud.getClassConfig(class_name);
         if (class_config){
             if (class_config.title_field_name){
                 var title_field_name = class_config.title_field_name;

@@ -1,0 +1,42 @@
+{
+  "name": "term",
+  "plural": "term",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true,
+    "mysql": {
+      "table": "term_data"
+    }
+  },
+  "properties": {
+    "tid": {
+      "type": "string",
+      "id": true
+    },
+    "vid": {
+      "type": "string",
+      "required": false
+    },
+    "name": {
+      "type": "string",
+      "required": false
+    },
+    "description": {
+      "type": "string",
+      "required": false
+    },
+    "weight": {
+      "type": "string",
+      "required": false
+    },
+    "parent_id": {
+      "type": "string",
+      "required": false
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}

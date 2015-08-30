@@ -89,287 +89,364 @@
         </style>
 
         <div style="display: table-row;">
-            <div id="table_container">
-                <!--<paper-material elevation="1" style="min-height: 1500px;">-->
-                    <div id="header">
-                    <div id="toggle_filters_container" style="display: table; width: 100%;">
-                        <div style="display: table-row;">
-                        <!--<span id="title">TITLE</span>-->
-                            <div id="add_remove">ADD <span style="color: #ccc;">REMOVE</span></div>
-                            <div id="spinner_container"><paper-spinner id="spinner"></paper-spinner></div>
-                            <div id="toggle_filters" on-click="crud_toggleFilters">&#x2630;</div>
+
+
+                    <div id="table_container">
+
+                            <paper-dialog-scrollable id="scrollable">
+
+                        <!--<paper-material elevation="1" style="min-height: 1500px;">-->
+                        <div id="header">
+                            <div id="toggle_filters_container" style="display: table; width: 100%;">
+                                <div style="display: table-row;">
+                                    <!--<span id="title">TITLE</span>-->
+                                    <div id="add_remove">ADD <span style="color: #ccc;">REMOVE</span></div>
+                                    <div id="spinner_container">
+                                        <paper-spinner id="spinner"></paper-spinner>
+                                    </div>
+                                    <div id="toggle_filters" on-click="crud_toggleFilters">&#x2630;</div>
+                                </div>
+                            </div>
+
+                            <div id="controls">
+                                <div id="filters"></div>
+                                <div id="orders"></div>
+                                <div id="limit">LIMIT</div>
+                            </div>
                         </div>
+                        <div id="list_container">
+                        </div>
+                        <!--</paper-material>-->
+
+                            </paper-dialog-scrollable>
+
                     </div>
 
-                    <div id="controls">
-                        <div id="filters"></div>
-                        <div id="orders"></div>
-                    </div>
-                    </div>
-                    <div id="list_container">
-                    </div>
-                <!--</paper-material>-->
-            </div>
+
             <div id="children_container">
             </div>
         </div>
     </template>
 
     <script>
-        var CrudTable = {
-            component: Polymer({
-                is: "crud-table",
-                crud_active_editor: null,
-                //afterTableLoad: null,
+        var CrudTable = Polymer({
+            is: "crud-table",
+            crud_class_name: '',
+            crud_active_editor: null,
 
-                crud_toggleFilters: function () {
-                    Polymer.dom(this.$.controls).classList.toggle('visible');
-                },
+            crud_toggleFilters: function () {
+                Polymer.dom(this.$.controls).classList.toggle('visible');
+            },
 
-                onFilterUpdate: function() {
-                    var crud_main_polymer =  document.querySelector('crud-main');
-                    crud_main_polymer.crud_updateLastContext(this);
-                    this.apiQuery();
-                },
+            onFilterUpdate: function () {
+                var crud_main_polymer = document.querySelector('crud-main');
+                crud_main_polymer.crud_updateLastContext(this);
+                this.apiQuery();
+            },
 
-                setAllRowsInactive: function() {
-                    var rows = this.$.list_container.querySelectorAll('crud-table-row');
-                    if (rows.length) {
-                        for (var i = 0; i < rows.length; i++) {
-                            var row_polymer = rows[i];
-                            row_polymer.setInactive();
-                        }
+            setAllRowsInactive: function () {
+                var rows = this.$.list_container.querySelectorAll('crud-table-row');
+                if (rows.length) {
+                    for (var i = 0; i < rows.length; i++) {
+                        var row_polymer = rows[i];
+                        row_polymer.setInactive();
                     }
-                },
+                }
+            },
 
-                factoryImpl: function (class_name, filters_arr, orders_arr) {
-                    this.crud_class_name = class_name;
+            factoryImpl: function (class_name, filters_arr, orders_arr) {
+                this.crud_class_name = class_name;
 
-                    //this.$.filters.dataset.class_name = class_name;
-                    //this.$.title.textContent = crud.getClassTitleByName(class_name);
+                this.renderFilters(filters_arr);
+                this.renderOrders(orders_arr);
+                this.renderLimit();
 
-                    CrudTable.renderFilters(class_name, this, filters_arr);
-                    CrudTable.renderOrders(class_name, this, orders_arr);
+                this.apiQuery();
 
-                    this.apiQuery();
-                },
+                var viewport_height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+                //this.$.scrollable.style.height = viewport_height;
+                viewport_height -= 200; // шапка. TODO: смотреть реальную высоту шапки (или контейнера), с учетом того, что таблица еще выводится внутри редактора
 
-                crud_replaceChildren: function (editor_component) {
-                    var children_container = this.$.children_container;
-                    var table_container = this.$.table_container;
+                Polymer.dom(this.$.scrollable).setAttribute('style', 'height: ' + viewport_height + 'px;');
+                //componentHandler.upgradeElement(this.$.scrollable);
+            },
 
-                    children_container.innerHTML = '';
+            renderLimit: function () {
+                var limit = this.getLimit();
+                this.$.limit.textContent = 'limit: ' + limit;
+            },
+
+            getLimit: function () {
+                var class_name = this.crud_class_name;
+                var class_config = crud.getClassConfig(class_name);
+                var table_config = class_config.table;
+
+                var limit = 100;
+                if (table_config.limit) {
+                    limit = table_config.limit;
+                }
+
+                return limit;
+            },
+
+            /**
+             * выводит редактор в таблице или удаляет редактор (если передать null)
+             */
+            crud_replaceChildren: function (editor_component) {
+                var children_container = this.$.children_container;
+                var table_container = this.$.table_container;
+
+                children_container.innerHTML = '';
+
+                if (editor_component) {
                     children_container.appendChild(editor_component);
 
                     children_container.classList.add('wide');
                     table_container.classList.add('narrow');
-                },
-
-                // возвращает массов фильтров таблицы
-                // в массив попадают только те фильтры, в которые чтото введено
-                // т.е. этот массив должен использоваться для передачи в апи или для сохранения в контексте
-                // элементами массива являются ассоциативные массивы с полями field_name и value
-                getFiltersValues: function(){
-                    var filters_arr = [];
-
-                    var filters = this.$.filters.querySelectorAll('crud-table-filter');
-                    if (filters.length) {
-                        for (var i = 0; i < filters.length; i++) {
-                            var filter_element = filters[i];
-                            var filter_field_name = filter_element.crud_field_name;
-                            var filter_value = filter_element.crud_field_value;
-                            if (filter_value) {
-                                filters_arr.push({'field_name': filter_field_name, 'value': filter_value});
-                            }
-                        }
-                    }
-
-                    return filters_arr;
-                },
-
-                appendWhereFilters: function (query_url) {
-                    var filters = this.getFiltersValues();
-
-                    for (var i in filters){
-                        var filter = filters[i];
-                        query_url += '&filter[where][' + filter.field_name + ']=' + filter.value;
-                    }
-
-                    return query_url;
-                },
-
-                apiQuery: function () {
-                    this.$.spinner.active = true;
-                    this.$.add_remove.classList.add('hidden');
-
-                    var class_name = this.crud_class_name;
-                    var limit = 0;
-
-                    Polymer.dom(this.$.list_container).innerHTML = '';
-
-                    var api_url = 'localhost:3001';
-                    //var api_url = 'localhost:8080';
-
-                    if (!limit) {
-                        limit = 100;
-                    }
-
-                    var query_url = 'http://' + api_url + '/' + class_name;
-                    query_url += '?1=1';
-
-                    query_url += '&filter[limit]=' + limit;
-
-                    query_url = this.appendWhereFilters(query_url);
-                    query_url = CrudTable.appendOrderFIlters(this, query_url);
-
-                    $.ajax({
-                        url: query_url,
-                        success: this.handleResponse.bind(this)
-                    });
-                },
-
-                handleResponse: function(data){
-                    this.$.spinner.active = false;
-                    this.$.add_remove.classList.remove('hidden');
-
-                    for (var i in data) {
-                        var obj = data[i];
-                        this.addObject(obj);
-                    }
-
-                    /*
-                    if (typeof(this.afterTableLoad) === 'function'){
-                        this.afterTableLoad();
-                    }
-                    */
-                },
-
-                addObject: function (obj) {
-                    Model.setClassNameForObj(obj, this.crud_class_name);
-
-                    var obj_full_id = Model.getFullIdForObj(obj);
-                    storage.setObject(obj_full_id, obj);
-
-                    var new_block_component = new CrudTableRow(obj_full_id, this);
-                    Polymer.dom(this.$.list_container).appendChild(new_block_component); // appends to <content>
-                },
-
-
-                crud_setActiveEditor: function(editor_polymer){
-                    this.crud_active_editor = editor_polymer;
-                    this.crud_replaceChildren(editor_polymer);
-                },
-
-                crud_getContextHash: function(){
-                    var hash = {
-                        type: 'crud-table',
-                        class_name: this.crud_class_name,
-                        str: this.crud_getContextStr()
-                    };
-
-                    hash.filters = this.getFiltersValues();
-
-                    if (this.crud_active_editor){
-                        hash.editor = this.crud_active_editor.crud_getContextHash();
-                    }
-
-                    return hash;
-                },
-
-                crud_getContextStr: function(){
-                    var str = '';
-                    str += crud.getClassTitleByName(this.crud_class_name);
-
-                    if (this.crud_active_editor){
-                        //str += ' ' + this.crud_active_editor.crud_getContextStr();
-                        var active_editor_obj_full_id = this.crud_active_editor.obj_full_id;
-                        var obj = storage.getObject(active_editor_obj_full_id);
-                        var obj_name = Model.getTitleForObj(obj);
-                        str += ': ' + obj_name;
-                    }
-
-                    return str;
+                } else {
+                    children_container.classList.remove('wide');
+                    table_container.classList.remove('narrow');
                 }
-            }),
+            },
 
-            appendOrderFIlters: function (table_component, query_url) {
-                var filters = $(table_component.$.orders).find('paper-checkbox');
+            crud_closeEditor: function () {
+                this.crud_setActiveEditor(null);
+
+                var crud_main_polymer = document.querySelector('crud-main');
+                console.assert(crud_main_polymer);
+                crud_main_polymer.crud_updateLastContext(this);
+            },
+
+            // возвращает массов фильтров таблицы
+            // в массив попадают только те фильтры, в которые чтото введено
+            // т.е. этот массив должен использоваться для передачи в апи или для сохранения в контексте
+            // элементами массива являются ассоциативные массивы с полями field_name и value
+            // пример: [{field_name: 'nid', value: 1234}]
+            getFiltersValues: function () {
+                var filters_arr = [];
+
+                var filters = this.$.filters.querySelectorAll('.crud_filter_polymer'); // здесь компоненты фильтров находим через класс, а не по имени компонента, потому что в качестве фильтров могут использоваться разные компоненты
                 if (filters.length) {
                     for (var i = 0; i < filters.length; i++) {
                         var filter_element = filters[i];
-                        var filter_field_name = filter_element.dataset.field_name;
-                        //var filter_value = filter_element.value;
-                        if (filter_element.checked) {
-                            query_url += '&filter[order]=' + filter_field_name + '%20DESC';
+                        var filter_field_name = filter_element.crud_field_name;
+                        var filter_value = filter_element.crud_field_value;
+                        if (filter_value) {
+                            filters_arr.push({'field_name': filter_field_name, 'value': filter_value});
                         }
                     }
+                }
+
+                return filters_arr;
+            },
+
+            // возвращает массов сортировок для таблицы
+            // в массив попадают только активные сортировки (т.е. не выключенные пользователем)
+            // этот массив должен использоваться для передачи в апи или для сохранения в контексте
+            // элементами массива являются ассоциативные массивы с полями field_name и direction (asc/desc)
+            // пример: [{field_name: 'weigth', order_direction: 'asc'}]
+            getOrdersValues: function () {
+                var filters_arr = [];
+
+                var filters = this.$.orders.querySelectorAll('crud-table-order');
+                if (filters.length) {
+                    for (var filter_index = 0; filter_index < filters.length; filter_index++) {
+                        var filter_element = filters[filter_index];
+                        var filter_field_name = filter_element.crud_field_name;
+                        var order_direction = filter_element.order_direction;
+                        //if (filter_value) { // здесь сделать проверку активности сортировки - после добавления активности в виджет сортировки (пока не нужна)
+                        filters_arr.push({'field_name': filter_field_name, 'order_direction': order_direction});
+                        //}
+                    }
+                }
+
+                return filters_arr;
+            },
+
+            appendWhereFilters: function (query_url) {
+                var filters = this.getFiltersValues();
+
+                for (var i in filters) {
+                    var filter = filters[i];
+                    query_url += '&filter[where][' + filter.field_name + ']=' + filter.value;
                 }
 
                 return query_url;
             },
 
-            renderFilters: function (class_name, self_component, filters_arr) {
-                var class_config = crud.config[class_name];
+            apiQuery: function () {
+                this.$.spinner.active = true;
+                this.$.add_remove.classList.add('hidden');
+
+                var class_name = this.crud_class_name;
+
+                Polymer.dom(this.$.list_container).innerHTML = '';
+
+                var api_url = crud.config.api_url;
+
+                var query_url = api_url + '/' + class_name;
+                query_url += '?1=1';
+
+                var limit = this.getLimit();
+                query_url += '&filter[limit]=' + limit;
+
+                query_url = this.appendWhereFilters(query_url);
+                query_url = this.appendOrderFIlters(query_url);
+
+                $.ajax({
+                    url: query_url,
+                    success: this.handleResponse.bind(this)
+                });
+            },
+
+            appendOrderFIlters: function (query_url) {
+                var filters = this.getOrdersValues();
+
+                for (var i in filters) {
+                    var filter = filters[i];
+                    query_url += '&filter[order][' + i + ']=' + filter.field_name + '%20' + filter.order_direction;
+                }
+
+                return query_url;
+            },
+
+
+            handleResponse: function (data) {
+                this.$.spinner.active = false;
+                this.$.add_remove.classList.remove('hidden');
+
+                for (var i in data) {
+                    var obj = data[i];
+                    this.addObject(obj);
+                }
+            },
+
+            addObject: function (obj) {
+                Model.setClassNameForObj(obj, this.crud_class_name);
+
+                var obj_full_id = Model.getFullIdForObj(obj);
+                storage.setObject(obj_full_id, obj);
+
+                var new_block_component = new CrudTableRow(obj_full_id, this);
+                Polymer.dom(this.$.list_container).appendChild(new_block_component); // appends to <content>
+            },
+
+
+            crud_setActiveEditor: function (editor_polymer) {
+                this.crud_active_editor = editor_polymer;
+                this.crud_replaceChildren(editor_polymer);
+            },
+
+            crud_getContextHash: function () {
+                var hash = {
+                    type: 'crud-table',
+                    class_name: this.crud_class_name,
+                    str: this.crud_getContextStr()
+                };
+
+                hash.filters = this.getFiltersValues();
+
+                if (this.crud_active_editor) {
+                    hash.editor = this.crud_active_editor.crud_getContextHash();
+                }
+
+                return hash;
+            },
+
+            crud_getContextStr: function () {
+                var str = crud.getClassTitleByName(this.crud_class_name);
+
+                if (this.crud_active_editor) {
+                    //str += ' ' + this.crud_active_editor.crud_getContextStr();
+                    var active_editor_obj_full_id = this.crud_active_editor.obj_full_id;
+                    var obj = storage.getObject(active_editor_obj_full_id);
+                    var obj_name = Model.getTitleForObj(obj);
+                    str = obj_name;
+                }
+
+                return str;
+            },
+
+            renderFilters: function (filters_arr) {
+                var class_name = this.crud_class_name;
+                var class_config = crud.getClassConfig(class_name);
                 var table_config = class_config.table;
 
                 if ('search_fields' in table_config) {
-                    for (var i in table_config.search_fields) {
-                        var search_field_config = table_config.search_fields[i];
+                    for (var field_index in table_config.search_fields) {
+                        var search_field_config = table_config.search_fields[field_index];
                         var search_field_name = search_field_config.field_name;
 
                         var search_field_value = '';
 
                         // сначала берем дефолтное значение фильтра из конфига
                         if ('value' in search_field_config) {
-                            var search_field_value = search_field_config.value;
+                            search_field_value = search_field_config.value;
                         }
 
                         // потом берем переопределенное значение фильтра (если таблица создается программно и фильтр определяется контекстом)
                         if (filters_arr) {
-                            /*
-                            if (filters_arr[search_field_name]) {
-                                search_field_value = filters_arr[search_field_name];
-                            }
-                            */
-
-                            for (var filter_index in filters_arr){
+                            for (var filter_index in filters_arr) {
                                 var filter = filters_arr[filter_index];
-                                if (filter.field_name == search_field_name){
+                                if (filter.field_name == search_field_name) {
                                     search_field_value = filter.value;
                                 }
                             }
                         }
 
-                        var filter_component = new CrudTableFilter.component(self_component, class_name, search_field_name, search_field_value);
 
-                        Polymer.dom(self_component.$.filters).appendChild(filter_component);
+                        var widget_name = 'input';
+
+                        if (search_field_config.widget) {
+                            widget_name = search_field_config.widget.name;
+                        }
+
+
+                        var filter_component = null;
+
+                        if (widget_name == 'input') {
+                            filter_component = new CrudTableFilter.component(this, class_name, search_field_name, search_field_value);
+                        }
+                        if (widget_name == 'model_select') {
+                            filter_component = new CrudTableFilterModelSelect(this, class_name, search_field_name, search_field_value, search_field_config.widget);
+                        }
+
+                        console.assert(filter_component);
+
+                        Polymer.dom(filter_component).classList.add('crud_filter_polymer'); // чтобы находить разные компоненты при чтении фильтров - см. getFilterValues()
+                        Polymer.dom(this.$.filters).appendChild(filter_component);
                     }
                 }
             },
 
-            renderOrders: function (class_name, self_component, orders_arr) {
-                var class_config = crud.config[class_name];
+            renderOrders: function (orders_arr) {
+                var class_name = this.crud_class_name;
+
+                var class_config = crud.getClassConfig(class_name);
                 var table_config = class_config.table;
 
                 if (table_config.order_fields) {
-                    for (var i in table_config.order_fields) {
-                        var order_field_config = table_config.order_fields[i];
+                    for (var field_index in table_config.order_fields) {
+                        var order_field_config = table_config.order_fields[field_index];
                         var order_field_name = order_field_config.field_name;
-                        var order_field_value = '';
+                        var order_field_direction = order_field_config.direction;
 
-                        if (orders_arr) {
-                            if (filters_arr[order_field_name]) {
-                                order_field_value = filters_arr[order_field_name];
-                            }
-                        }
+                        /*
+                         if (orders_arr) {
+                         if (filters_arr[order_field_name]) {
+                         order_field_value = filters_arr[order_field_name];
+                         }
+                         }
+                         */
 
-                        var filter_component = new CrudTableOrder.component(self_component, class_name, order_field_name, order_field_value);
+                        var filter_component = new CrudTableOrder(this, class_name, order_field_name, order_field_direction);
 
-                        Polymer.dom(self_component.$.orders).appendChild(filter_component);
+                        Polymer.dom(this.$.orders).appendChild(filter_component);
                     }
                 }
             }
-        };
+        });
+
     </script>
 
 </dom-module>

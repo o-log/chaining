@@ -74,10 +74,14 @@
                 this.$.label.textContent = title;
                 this.$.input.name = field_name;
 
+                if (field_value != 0){ // TODO: написать проверку получше, учесть пустые строки / null
+                    var linked_full_obj_id = widget_params.class_name + '::' + field_value;
 
-                var linked_full_obj_id = widget_params.class_name + '::' + field_value;
-
-                storage.getObjectDeferred(linked_full_obj_id, this.onLinkedObjLoad.bind(this));
+                    // теперь получим объект, на который ссылается поле
+                    storage.getObjectDeferred(linked_full_obj_id, this.onLinkedObjLoad.bind(this));
+                } else {
+                    Polymer.dom(this.$.link).textContent = '-';
+                }
             },
 
             onLinkedObjLoad: function(obj) {
@@ -89,11 +93,11 @@
                 this.params = widget_params;
                 this.obj_full_id = obj_full_id;
 
-                // TODO: переместить загрузку и вывод в ready()?
-
+                // сначала получим объект, который редактируется
                 storage.getObjectDeferred(obj_full_id, this.onSelfObjLoad.bind(this));
             },
 
+            // TODO: закончить добавление фильтра
             linkClick: function() {
                 var field_name = this.field_name;
                 var widget_params = this.params;
@@ -112,16 +116,6 @@
                 console.assert(crud_main_polymer);
                 crud_main_polymer.crud_setLocationHashFromContextsArr(contexts_arr);
                 crud_main_polymer.crud_updateFromHash();
-
-                /*
-                var hash_str = JSON.stringify(hash);
-
-
-                window.location.hash = hash_str;
-                var classes_list_polymer =  document.getElementsByTagName('crud-classes-list')[0];
-                classes_list_polymer.crud_updateFromHash();
-                */
-
             },
 
             ready: function(){

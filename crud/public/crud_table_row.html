@@ -12,15 +12,15 @@
         */
 
         #row {
-            padding: 10px 20px;
+            padding: 5px 20px;
             font-size: 16px;
             font-family: Roboto;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #E0E0E0;
             font-weight: 100;
         }
 
         #row.active {
-            background-color: #fff;
+            background-color: #4DB6AC;
         }
     </style>
 
@@ -49,7 +49,7 @@
                 var obj = storage.getObject(full_obj_id);
 
                 var obj_class_name = obj._class_name;
-                var class_config = crud.config[obj_class_name];
+                var class_config = crud.getClassConfig(obj_class_name);
                 var list_config = class_config.table;
 
                 /*
@@ -82,6 +82,7 @@
                             new_cell_component = new CrudTableCell_timestamp(full_obj_id, field_name, field_widget.params, crud_table_component, this);
                             break;
                     }
+                    console.assert(new_cell_component);
 
                     Polymer.dom(this).appendChild(new_cell_component);
                 }

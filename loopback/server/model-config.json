@@ -68,6 +68,18 @@
     "dataSource": "db-news",
     "public": true
   },
+  "site_menu": {
+    "dataSource": "db-news",
+    "public": true
+  },
+  "term": {
+    "dataSource": "db-news",
+    "public": true
+  },
+  "vocabulary": {
+    "dataSource": "db-news",
+    "public": true
+  },
   "adminlog": {
     "dataSource": "db-news",
     "public": true

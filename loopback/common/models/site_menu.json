@@ -1,0 +1,50 @@
+{
+  "name": "site_menu",
+  "plural": "site_menu",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true,
+    "mysql": {
+      "table": "site_menu"
+    }
+  },
+  "properties": {
+    "text": {
+      "type": "string",
+      "required": false
+    },
+    "url": {
+      "type": "string",
+      "required": false
+    },
+    "term_id": {
+      "type": "string",
+      "required": false
+    },
+    "weight": {
+      "type": "string",
+      "required": false
+    },
+    "extra_html": {
+      "type": "string",
+      "required": false
+    },
+    "parent_id": {
+      "type": "string",
+      "required": false
+    },
+    "is_published": {
+      "type": "string",
+      "required": false
+    },
+    "alternative_html": {
+      "type": "string",
+      "required": false
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}

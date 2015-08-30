@@ -10,18 +10,33 @@
             }
 
             #contexts_container {
-                padding: 20px 20px 20px 20px;
-                border-bottom: 1px solid #ddd;
                 font-family: Roboto;
                 font-size: 16px;
+                margin: 10px;
             }
 
             #contexts_container div {
+                display: inline-block;
+                /*background-color: #81C784;*/
                 color: #0D47A1;
+                /*padding: 5px 10px;*/
+                /*border-bottom: 1px solid #66BB6A;*/
+
+            }
+            #contexts_container div:after {
+                content: "/";
+                padding-left: 5px;
+                padding-right: 5px;
             }
 
             #contexts_container :last-child {
+                display: none;
+                background-color: inherit;
                 color: #ccc;
+            }
+
+            #contexts_container :last-child:after {
+                content: "";
             }
 
             #children_container {
@@ -42,13 +57,13 @@
             crud_openClass: function (class_name) {
                 this.contexts_arr = [];
 
-                var table_polymer = new CrudTable.component(class_name);
+                var table_polymer = new CrudTable(class_name);
                 this.crud_setActiveTable(table_polymer, true);
             },
 
             /**
-             * заменяет контент круда на указанную таблицу и добавляет ее в массив контекстов.
-             * если таблица уже есть в контексте (например, создается при чтении контекста) - добавление контекста можно выключить параметром append_context.
+             * заменяет контент круда на указанную таблицу и добавляет таблицу в массив контекстов.
+             * если эта таблица уже есть в контексте (например, создается при чтении контекста) - добавление контекста можно выключить параметром append_context.
              * @param table_polymer
              */
             crud_setActiveTable: function (table_polymer, append_context) {
@@ -59,6 +74,9 @@
                 }
             },
 
+            /**
+             * заменяет последний контекст на данные указанной таблицы. используется при например смене редактора в таблице, или таба в редакторе.
+             */
             crud_updateLastContext: function (crud_table_polymer) {
                 if (!this.contexts_arr.length) {
                     return;
@@ -126,7 +144,7 @@
 
                 var last_context_obj = this.contexts_arr[this.contexts_arr.length - 1]; // TODO: check length
 
-                var table_polymer = new CrudTable.component(last_context_obj.class_name, last_context_obj.filters);
+                var table_polymer = new CrudTable(last_context_obj.class_name, last_context_obj.filters);
                 if (last_context_obj.editor) {
                     // если в контексте есть редактор объекта - открываем редактор только после того, как список будет загружен и объекты попадут в хранилище
                     var obj_full_id = last_context_obj.editor.obj_full_id;
@@ -139,62 +157,6 @@
                 this.renderContexts();
 
             },
-
-            /*
-            crud_createEditorAfterTableLoad: function(obj_full_id, table_polymer) {
-                var editor_component = new crudEditor.component(obj_full_id, table_polymer);
-                table_polymer.crud_setActiveEditor(editor_component);
-            },
-            */
-
-            /*
-             crud_clearContexts: function () {
-             var contexts_container = this.$.contexts_container;
-             contexts_container.innerHTML = '';
-             },
-
-             crud_updateContext: function (crud_table_polymer, append) {
-             var contexts_container = this.$.contexts_container;
-
-             var hash = crud_table_polymer.crud_getContextHash();
-             var str = crud_table_polymer.crud_getContextStr();
-             var hash_str = JSON.stringify(hash);
-
-             var elem = document.createElement('div');
-             elem.textContent = str;
-
-             var classes_list_polymer = this;
-
-             elem.onclick = function () {
-             // стираем из истории контекстов выбранный контекст и все последующие
-             // потом, при переходе на выбранный контекст он снова допишется в конец истории и станет текущим
-             var nodes = Polymer.dom(classes_list_polymer.$.contexts_container).childNodes;
-             if (nodes.length) {
-             var after_this = false;
-             for (var i = 0; i < nodes.length; i++) {
-             var node = nodes[i];
-             if ((node == this) || after_this) {
-             Polymer.dom(classes_list_polymer.$.contexts_container).removeChild(node);
-             after_this = true;
-             }
-             }
-             }
-
-             window.location.hash = hash_str;
-             classes_list_polymer.crud_updateFromHash();
-             };
-
-             if (!append) {
-             var lc = Polymer.dom(contexts_container).lastChild;
-             if (lc) {
-             Polymer.dom(contexts_container).removeChild(lc);
-             }
-             }
-             Polymer.dom(contexts_container).appendChild(elem);
-
-             window.location.hash = hash_str;
-             },
-             */
 
             crud_replaceChildren: function (list) {
                 var children_container = this.$.children_container;

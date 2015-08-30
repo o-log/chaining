@@ -13,7 +13,7 @@
             crud_main_polymer: null,
 
             ready: function () {
-                for (var class_name in crud.config) {
+                for (var class_name in crud.config.models) {
                      var a = el('a', {class: 'mdl-navigation__link'}, crud.getClassTitleByName(class_name));
                      a.onclick = this.classOnClick.bind(this, class_name);
 

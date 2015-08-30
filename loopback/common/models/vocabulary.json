@@ -1,0 +1,62 @@
+{
+  "name": "vocabulary",
+  "plural": "vocabulary",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true,
+    "mysql": {
+      "table": "vocabulary"
+    }
+  },
+  "properties": {
+    "vid": {
+      "type": "string",
+      "id": true
+    },
+    "name": {
+      "type": "string",
+      "required": false
+    },
+    "description": {
+      "type": "string",
+      "required": false
+    },
+    "help": {
+      "type": "string",
+      "required": false
+    },
+    "relations": {
+      "type": "string",
+      "required": false
+    },
+    "hierarchy": {
+      "type": "string",
+      "required": false
+    },
+    "multiple": {
+      "type": "string",
+      "required": false
+    },
+    "required": {
+      "type": "string",
+      "required": false
+    },
+    "tags": {
+      "type": "string",
+      "required": false
+    },
+    "module": {
+      "type": "string",
+      "required": false
+    },
+    "weight": {
+      "type": "string",
+      "required": false
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}
